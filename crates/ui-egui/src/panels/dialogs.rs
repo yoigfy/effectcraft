@@ -7,7 +7,6 @@ use egui::{Align2, Color32, Rect, Sense, pos2, vec2};
 use serde_json::{Value, json};
 
 pub use super::forms::{Field, form, info, open_form};
-use crate::icons::{self, Icon};
 use crate::theme::Tokens;
 use crate::{Dialog, EffectcraftApp};
 
