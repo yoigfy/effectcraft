@@ -185,7 +185,7 @@ page!(Appearance {
     use_label_color_for_handles: bool = true,
     use_label_color_for_tabs: bool = true,
     cycle_mask_colors: bool = true,
-    use_gradients: bool = true,
+    use_gradients: bool = false,
     /// macOS: draw the menu bar inside the window instead of the system menu bar.
     in_window_menu_bar_mac: bool = false,
 });
