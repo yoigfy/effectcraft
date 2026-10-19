@@ -1,0 +1,35 @@
+
+name: Build TokEffect for Windows
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Windows EXE
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v2
+        with:
+          toolchain: stable
+
+      - name: Build release executable
+        run: cargo build --release
+
+      - name: Upload TokEffect EXE
+        uses: actions/upload-artifact@v7
+        with:
+          name: TokEffect-Windows
+          path: target/release/*.exe
+          if-no-files-found: error
+          retention-days: 14
