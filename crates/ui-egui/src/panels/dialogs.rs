@@ -1,4 +1,4 @@
-//! Modal dialogs: About (community links, Contributors and Models credits), New Composition /
+//! Modal dialogs: About, Contributors and Models credits, New Composition /
 //! Composition Settings, Solid Settings and the command palette (Camera/Light Settings live in `dialogs_3d`).
 
 use crate::i18n::{tr, tr_args};
@@ -272,7 +272,6 @@ const CREDITS_HEIGHT: f32 = 380.0;
 
 fn about(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
     let mut close = false;
-    let mut cmd: Option<&str> = None;
     let tab_id = egui::Id::new("about_tab");
     modal(ctx, "About TokEffect", vec2(680.0, 520.0), t, |ui| {
         let mut tab = ui.data_mut(|d| d.get_temp::<usize>(tab_id)).unwrap_or(0);
@@ -299,7 +298,7 @@ fn about(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
                     }
                 });
             }
-            _ => about_main(app, ui, t, &mut cmd),
+            _ => about_main(ui, t),
         }
         ui.add_space(8.0);
         ui.horizontal(|ui| {
@@ -313,16 +312,13 @@ fn about(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
             });
         });
     });
-    if let Some(c) = cmd {
-        let _ = app.session.execute(c, json!({}));
-    }
     if close {
         app.dialog = None;
     }
 }
 
-/// The About tab: logo, version, blurb and community links.
-fn about_main(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, cmd: &mut Option<&'static str>) {
+/// The About tab: wordmark, version and blurb.
+fn about_main(ui: &mut egui::Ui, t: &Tokens) {
     let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 96.0), Sense::hover());
     let p = ui.painter();
     p.rect_filled(r, 8.0, t.panel_bg);
@@ -336,44 +332,6 @@ fn about_main(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, cmd: &mut
     );
     ui.add_space(12.0);
     ui.label(tr("A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps."));
-    ui.add_space(14.0);
-    let links: [(Icon, &str, &str, &'static str); 4] = [
-        (Icon::Chat, "Join the ArtCraft Discord", effectcraft_engine::links::DISCORD, "help.discord"),
-        (Icon::Globe, "ArtCraft website", effectcraft_engine::links::WEBSITE, "help.website"),
-        (Icon::Sparkle, "TokEffect home page", effectcraft_engine::links::APP_PAGE, "help.appPage"),
-        (Icon::Code, "Source code on GitHub", effectcraft_engine::links::GITHUB, "help.github"),
-    ];
-    for (icon, label, url, c) in links {
-        let (r, resp) = ui.allocate_exact_size(vec2(ui.available_width(), 30.0), Sense::click());
-        let p = ui.painter();
-        let discord = c == "help.discord";
-        p.rect_filled(
-            r,
-            6.0,
-            if discord {
-                Color32::from_rgb(0x58, 0x65, 0xf2)
-            } else if resp.hovered() {
-                t.hover
-            } else {
-                t.field_bg
-            },
-        );
-        let foreground = if discord { Color32::WHITE } else { t.text };
-        icons::paint(p, Rect::from_center_size(pos2(r.min.x + 18.0, r.center().y), vec2(15.0, 15.0)), icon, foreground);
-        p.text(pos2(r.min.x + 36.0, r.center().y), Align2::LEFT_CENTER, tr(label), Tokens::medium(12.5), foreground);
-        p.text(
-            pos2(r.max.x - 12.0, r.center().y),
-            Align2::RIGHT_CENTER,
-            url,
-            Tokens::ui(11.0),
-            if discord { Color32::from_white_alpha(200) } else { t.text_dim },
-        );
-        app.auto.add(&format!("about.{c}"), r, label);
-        if resp.clicked() {
-            *cmd = Some(c);
-        }
-        ui.add_space(4.0);
-    }
 }
 
 fn comp_settings(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens, existing: bool) {

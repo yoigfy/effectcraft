@@ -117,7 +117,7 @@ fn import_project(s: &mut Session, p: &Value) -> Result<Value> {
 pub fn specs() -> Vec<CommandSpec> {
     vec![cmd!(
         "file.importProject",
-        "EffectCraft Project...",
+        "TokEffect Project...",
         ["File", "Import"],
         None,
         "{path (.ecproj or .ecprojx)} — merges the project into a folder named after the file; returns {folder, items, comps, rootComps, primaryComp (the only root comp, else null), missingMedia, warnings}",

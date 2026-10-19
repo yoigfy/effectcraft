@@ -68,13 +68,11 @@ fn vanishing_point_import_is_disabled_with_a_reason() {
 }
 
 #[test]
-fn help_tutorials() {
+fn in_app_tutorials_remain_available() {
     let mut s = Session::default();
     s.drain_events();
-    s.execute("help.onlineTutorials", json!({})).unwrap();
     s.execute("help.inAppTutorials", json!({})).unwrap();
     let ev = s.drain_events();
-    assert!(ev.iter().any(|e| matches!(e, Event::OpenUrl(u) if u == crate::links::APP_PAGE)));
     assert!(ev.iter().any(|e| matches!(e, Event::Frontend { command, .. } if command == "help.inAppTutorials")));
 }
 
