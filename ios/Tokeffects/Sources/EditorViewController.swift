@@ -73,7 +73,7 @@ final class EditorViewController: UIViewController, WKNavigationDelegate, WKUIDe
     }
 
     private func isBundledEditorURL(_ url: URL) -> Bool {
-        url.scheme == "http" && url.host == "127.0.0.1" && url.port == LocalWebServer.port
+        url.scheme == "http" && url.host == "127.0.0.1" && url.port == Int(LocalWebServer.port)
     }
 
     private func showStartupError(_ message: String) {
