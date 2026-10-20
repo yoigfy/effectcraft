@@ -272,7 +272,7 @@ const CREDITS_HEIGHT: f32 = 380.0;
 fn about(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
     let mut close = false;
     let tab_id = egui::Id::new("about_tab");
-    modal(ctx, "About TokEffect", vec2(680.0, 520.0), t, |ui| {
+    modal(ctx, "About Tokeffects", vec2(680.0, 520.0), t, |ui| {
         let mut tab = ui.data_mut(|d| d.get_temp::<usize>(tab_id)).unwrap_or(0);
         ui.horizontal(|ui| {
             for (i, (label, id)) in ABOUT_TABS.iter().enumerate() {
@@ -321,7 +321,7 @@ fn about_main(ui: &mut egui::Ui, t: &Tokens) {
     let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 96.0), Sense::hover());
     let p = ui.painter();
     p.rect_filled(r, 8.0, t.panel_bg);
-    p.text(r.min + vec2(18.0, 34.0), Align2::LEFT_CENTER, "TokEffect", Tokens::semibold(24.0), t.text);
+    p.text(r.min + vec2(18.0, 34.0), Align2::LEFT_CENTER, "Tokeffects", Tokens::semibold(24.0), t.text);
     p.text(
         r.min + vec2(18.0, 62.0),
         Align2::LEFT_CENTER,
