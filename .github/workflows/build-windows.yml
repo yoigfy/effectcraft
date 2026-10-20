@@ -33,6 +33,9 @@ jobs:
         with:
           cache-on-failure: true
 
+      - name: Test native motion presets
+        run: cargo test --locked -p effectcraft-engine --lib every_motion_preset_applies_and_undoes
+
       - name: Build optimized Tokeffects executable
         run: cargo build --release --locked -p tokeffects
         env:
