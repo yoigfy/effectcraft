@@ -1,4 +1,4 @@
-//! EffectCraft desktop app.
+//! TokEffect desktop app.
 //!
 //! Usage: `effectcraft [--control <port>] [--demo|--empty|--home] [--] [project.ecproj | media files…]`
 //!
@@ -141,12 +141,12 @@ fn main() -> eframe::Result {
     let Args { control_port, files, demo, home } = match parse_args(std::env::args().skip(1), std::env::var("EFFECTCRAFT_CONTROL_PORT")) {
         Ok(Some(args)) => args,
         Ok(None) => {
-            println!("effectcraft {}", env!("CARGO_PKG_VERSION"));
+            println!("TokEffect {}", env!("CARGO_PKG_VERSION"));
             return Ok(());
         }
         // Before the session log, preferences and the window: nothing has started yet.
         Err(e) => {
-            eprintln!("effectcraft: {e}");
+            eprintln!("TokEffect: {e}");
             std::process::exit(1);
         }
     };
@@ -155,7 +155,7 @@ fn main() -> eframe::Result {
     // `--version` leaves no file behind; records logged until now are written to it first.
     if let Some(dir) = effectcraft_host::config_dir() {
         match effectcraft_engine::logging::attach_session_log(&effectcraft_engine::logging::log_dir(Some(&dir))) {
-            Ok(path) => log::info!("effectcraft {}, log file {}", env!("CARGO_PKG_VERSION"), path.display()),
+            Ok(path) => log::info!("TokEffect {}, log file {}", env!("CARGO_PKG_VERSION"), path.display()),
             Err(e) => log::warn!("no log file: {e}"),
         }
     }
@@ -186,7 +186,7 @@ fn main() -> eframe::Result {
     };
     // Start-up milestones go to stderr and the session log, so a window that never appears
     // shows how far start-up got (#234).
-    log::info!("effectcraft {}: opening the window", env!("CARGO_PKG_VERSION"));
+    log::info!("TokEffect {}: opening the window", env!("CARGO_PKG_VERSION"));
     // Registered before the event loop starts, so it catches the Finder event that launched us as
     // well as later ones. Lives until the event loop returns; the app creator only borrows it.
     #[cfg(target_os = "macos")]
@@ -366,7 +366,7 @@ fn wgpu_options(backends: Option<eframe::wgpu::Backends>) -> eframe::WgpuConfigu
         // `WGPU_VALIDATION_INDIRECT_CALL=1` turns the check back on.
         setup.instance_descriptor.flags = setup.instance_descriptor.flags.difference(eframe::wgpu::InstanceFlags::VALIDATION_INDIRECT_CALL).with_env();
         setup.device_descriptor = std::sync::Arc::new(|adapter| eframe::wgpu::DeviceDescriptor {
-            label: Some("EffectCraft device"),
+            label: Some("TokEffect device"),
             required_limits: device_limits(adapter.limits()),
             ..Default::default()
         });
@@ -392,7 +392,7 @@ fn startup_failed(e: &eframe::Error, gl_next: bool) {
     if log::log_enabled!(log::Level::Error) {
         log::error!("{message}");
     } else {
-        eprintln!("effectcraft: {message}");
+        eprintln!("TokEffect: {message}");
     }
     let _ = rfd::MessageDialog::new()
         .set_level(rfd::MessageLevel::Error)
@@ -472,7 +472,7 @@ fn disable_app_nap() {
     {
         use objc2_foundation::{NSActivityOptions, NSProcessInfo, NSString};
         let info = NSProcessInfo::processInfo();
-        let reason = NSString::from_str("EffectCraft control channel");
+        let reason = NSString::from_str("TokEffect control channel");
         let opts = NSActivityOptions::UserInitiatedAllowingIdleSystemSleep | NSActivityOptions::LatencyCritical;
         // Leaked on purpose: the activity lasts for the life of the process.
         std::mem::forget(info.beginActivityWithOptions_reason(opts, &reason));
