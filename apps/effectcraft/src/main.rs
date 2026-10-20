@@ -159,8 +159,6 @@ fn main() -> eframe::Result {
             Err(e) => log::warn!("no log file: {e}"),
         }
     }
-    // The font menus list the installed fonts: read their names while the window opens.
-    effectcraft_engine::text::fonts::scan_system_in_background();
     // Wayland shows the window's icon from its desktop entry: an AppImage brings its own.
     #[cfg(target_os = "linux")]
     appimage::integrate_from_env(ICON_PNG);
@@ -564,6 +562,9 @@ impl eframe::App for Desktop {
             self.window.frame(ui.ctx(), app.session.config.as_deref());
             if !self.drawn {
                 self.drawn = true;
+                // Start the optional system-font inventory only after the first editor frame is
+                // visible, so a large font collection cannot compete with GPU/window startup.
+                effectcraft_engine::text::fonts::scan_system_in_background();
                 log::info!("first editor frame drawn");
             }
         } else {

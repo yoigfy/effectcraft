@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value, json};
 
 /// Current settings layout version.
-pub const PREFS_VERSION: u32 = 5;
+pub const PREFS_VERSION: u32 = 6;
 /// Settings file name in the config store.
 pub const PREFS_FILE: &str = "prefs.json";
 
@@ -569,6 +569,19 @@ pub fn migrate(mut v: Value) -> Value {
             a.insert("appearanceMode".into(), json!("dark"));
             a.insert("darkTheme".into(), json!("dark"));
             a.insert("useGradients".into(), json!(false));
+        }
+    }
+
+    // Tokeffects v6: the workspace is intentionally dark, flat and monochrome.
+    // Apply this once even for installations that saved a Light/Auto mode in v5.
+    if version < 6 {
+        let appearance = obj.entry("appearance".to_string()).or_insert_with(|| json!({}));
+        if let Some(a) = appearance.as_object_mut() {
+            a.insert("theme".into(), json!("dark"));
+            a.insert("appearanceMode".into(), json!("dark"));
+            a.insert("darkTheme".into(), json!("dark"));
+            a.insert("useGradients".into(), json!(false));
+            a.insert("brightness".into(), json!(0.0));
         }
     }
 
@@ -1586,11 +1599,24 @@ mod tokeffects_defaults_tests {
     }
 
     #[test]
+    fn version_five_preferences_migrate_to_neutral_dark_mode() {
+        let p = Prefs::from_json(
+            r#"{"version":5,"appearance":{"theme":"light","appearanceMode":"light","darkTheme":"darker","lightTheme":"light","useGradients":true,"brightness":0.7}}"#,
+        );
+        assert_eq!(p.version, 6);
+        assert_eq!(p.appearance.appearance_mode, "dark");
+        assert_eq!(p.appearance.theme, "dark");
+        assert_eq!(p.appearance.dark_theme, "dark");
+        assert!(!p.appearance.use_gradients);
+        assert_eq!(p.appearance.brightness, 0.0);
+    }
+
+    #[test]
     fn version_two_preferences_migrate_to_tokeffects_defaults() {
         let p = Prefs::from_json(
             r#"{"version":2,"appearance":{"theme":"light","appearanceMode":"light","darkTheme":"dark","lightTheme":"light","useGradients":true},"previews":{"fastPreviews":false,"zoomQuality":"moreAccurate"},"startup":{"showHomeOnLaunch":true}}"#,
         );
-        assert_eq!(p.version, 5);
+        assert_eq!(p.version, 6);
         assert_eq!(p.appearance.appearance_mode, "dark");
         assert_eq!(p.appearance.theme, "dark");
         assert!(!p.appearance.use_gradients);

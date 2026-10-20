@@ -197,47 +197,44 @@ impl Tokens {
                 ..dark
             },
             ThemeKind::Light => Tokens {
-                app_bg: Color32::from_rgb(0xed, 0xf1, 0xf7),
-                header_bg: Color32::from_rgb(0xf8, 0xfa, 0xfc),
-                panel_bg: Color32::from_rgb(0xff, 0xff, 0xff),
-                tab_text: Color32::from_rgb(0x65, 0x71, 0x86),
-                tab_text_active: Color32::from_rgb(0x0f, 0x17, 0x2a),
-                text: Color32::from_rgb(0x1f, 0x29, 0x37),
-                text_dim: Color32::from_rgb(0x55, 0x61, 0x76),
-                text_faint: Color32::from_rgb(0x65, 0x71, 0x86),
-                hot_text: Color32::from_rgb(0x1d, 0x4e, 0xd8),
-                timecode: Color32::from_rgb(0x1d, 0x4e, 0xd8),
-                focus: Color32::from_rgb(0x60, 0xa5, 0xfa),
-                accent: Color32::from_rgb(0x25, 0x63, 0xeb),
-                accent_hover: Color32::from_rgb(0x1d, 0x4e, 0xd8),
-                cti: Color32::from_rgb(0x25, 0x63, 0xeb),
-                keyframe_selected: Color32::from_rgb(0x25, 0x63, 0xeb),
-                icon: Color32::from_rgb(0x4b, 0x55, 0x63),
-                icon_active: Color32::from_rgb(0x11, 0x18, 0x27),
-                hover: Color32::from_rgb(0xee, 0xf2, 0xf7),
-                pressed: Color32::from_rgb(0xdf, 0xe6, 0xf0),
-                field_bg: Color32::from_rgb(0xff, 0xff, 0xff),
-                field_border: Color32::from_rgb(0xc8, 0xd1, 0xde),
-                separator: Color32::from_rgb(0xdb, 0xe2, 0xec),
-                row: Color32::from_rgb(0xff, 0xff, 0xff),
-                row_alt: Color32::from_rgb(0xf6, 0xf8, 0xfb),
-                row_selected: Color32::from_rgb(0xdb, 0xea, 0xfe),
-                tl_bg: Color32::from_rgb(0xe9, 0xee, 0xf5),
-                tl_ruler_bg: Color32::from_rgb(0xf3, 0xf6, 0xfa),
-                tl_ruler_text: Color32::from_rgb(0x47, 0x55, 0x69),
-                pasteboard: Color32::from_rgb(0xdf, 0xe6, 0xef),
-                // Keyframes have no outline: dark enough to stand out on the light time graph.
-                keyframe: Color32::from_rgb(0x64, 0x74, 0x8b),
-                // Custom-painted surfaces in the Light palette, so dark text stays readable on
-                // them (#644).
-                fx_header: Color32::from_rgb(0xf1, 0xf5, 0xf9),
-                fx_header_active: Color32::from_rgb(0xdb, 0xea, 0xfe),
-                tl_graph_selected: Color32::from_rgb(0xd9, 0xe4, 0xf2),
-                switch_well: Color32::from_rgb(0xe4, 0xea, 0xf2),
-                tl_nav_bar: Color32::from_rgb(0x9c, 0xae, 0xc6),
-                tl_work_area_bar: Color32::from_rgb(0x93, 0xb4, 0xee),
-                expr_bg: Color32::from_rgb(0xf8, 0xfa, 0xfc),
-                expr_text: Color32::from_rgb(0xb4, 0x23, 0x18),
+                app_bg: Color32::from_gray(242),
+                header_bg: Color32::from_gray(250),
+                panel_bg: Color32::WHITE,
+                tab_text: Color32::from_gray(116),
+                tab_text_active: Color32::from_gray(27),
+                text: Color32::from_gray(42),
+                text_dim: Color32::from_gray(100),
+                text_faint: Color32::from_gray(116),
+                hot_text: Color32::from_gray(40),
+                timecode: Color32::from_gray(40),
+                focus: Color32::from_gray(170),
+                accent: Color32::from_gray(124),
+                accent_hover: Color32::from_gray(108),
+                cti: Color32::from_gray(124),
+                keyframe_selected: Color32::from_gray(124),
+                icon: Color32::from_gray(86),
+                icon_active: Color32::from_gray(27),
+                hover: Color32::from_gray(242),
+                pressed: Color32::from_gray(231),
+                field_bg: Color32::WHITE,
+                field_border: Color32::from_gray(210),
+                separator: Color32::from_gray(227),
+                row: Color32::WHITE,
+                row_alt: Color32::from_gray(248),
+                row_selected: Color32::from_gray(236),
+                tl_bg: Color32::from_gray(239),
+                tl_ruler_bg: Color32::from_gray(246),
+                tl_ruler_text: Color32::from_gray(87),
+                pasteboard: Color32::from_gray(231),
+                keyframe: Color32::from_gray(118),
+                fx_header: Color32::from_gray(245),
+                fx_header_active: Color32::from_gray(236),
+                tl_graph_selected: Color32::from_gray(229),
+                switch_well: Color32::from_gray(235),
+                tl_nav_bar: Color32::from_gray(176),
+                tl_work_area_bar: Color32::from_gray(188),
+                expr_bg: Color32::from_gray(250),
+                expr_text: Color32::from_gray(82),
                 ..dark
             },
         }
@@ -268,14 +265,16 @@ impl Tokens {
         let mut t = Tokens::for_kind(kind).with_brightness(p.appearance.brightness as f32);
         for (i, l) in effectcraft_color::Label::ALL.iter().enumerate() {
             let [r, g, b] = p.label_rgb(*l);
-            t.labels[i] = Color32::from_rgb(r, g, b);
+            // Keep user-defined label distinctions by luminance, never hue.
+            let gray = ((u16::from(r) + u16::from(g) + u16::from(b)) / 3) as u8;
+            t.labels[i] = Color32::from_gray(gray);
         }
         t.gradients = p.appearance.use_gradients;
         t
     }
 
-    /// Lighten (b > 0) or darken (b < 0) the interface greys, like After Effects' brightness
-    /// slider. Accent colours, labels and keyframe colours are kept.
+    /// Lighten (b > 0) or darken (b < 0) the interface greys. The entire UI palette is monochrome;
+    /// saved label colours are converted to greyscale when the theme tokens are built.
     pub fn with_brightness(mut self, b: f32) -> Tokens {
         let b = b.clamp(-1.0, 1.0);
         if b.abs() < 1e-3 {
@@ -663,6 +662,30 @@ mod tests {
     /// The last `n` font names of `family`, in order.
     fn tail(family: &[String], n: usize) -> Vec<&str> {
         family.iter().rev().take(n).rev().map(String::as_str).collect()
+    }
+
+    #[test]
+    fn both_themes_use_only_grayscale_ui_tokens() {
+        for kind in [ThemeKind::Dark, ThemeKind::Darker, ThemeKind::Light] {
+            let t = Tokens::for_kind(kind);
+            for color in [
+                t.app_bg, t.header_bg, t.panel_bg, t.tab_text, t.tab_text_active, t.focus,
+                t.accent, t.accent_hover, t.text, t.text_dim, t.text_faint, t.icon,
+                t.icon_active, t.hover, t.pressed, t.field_bg, t.field_border, t.separator,
+                t.row, t.row_alt, t.row_selected, t.hot_text, t.tl_bg, t.tl_ruler_bg,
+                t.tl_ruler_tick, t.tl_ruler_text, t.cti, t.work_area, t.cache_green,
+                t.cache_blue, t.keyframe, t.keyframe_selected, t.pasteboard, t.timecode,
+                t.danger, t.warning, t.fx_header, t.fx_header_active, t.tl_graph_selected,
+                t.switch_well, t.tl_nav_bar, t.tl_work_area_bar, t.expr_bg, t.expr_text,
+            ] {
+                assert_eq!(color.r(), color.g(), "{kind:?} token is not grayscale: {color:?}");
+                assert_eq!(color.g(), color.b(), "{kind:?} token is not grayscale: {color:?}");
+            }
+            for color in t.labels {
+                assert_eq!(color.r(), color.g(), "{kind:?} label is not grayscale: {color:?}");
+                assert_eq!(color.g(), color.b(), "{kind:?} label is not grayscale: {color:?}");
+            }
+        }
     }
 
     #[test]

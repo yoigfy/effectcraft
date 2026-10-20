@@ -54,7 +54,7 @@ pub fn utc_stamp(unix: u64) -> String {
 
 fn status_color(t: &Tokens, s: &RenderStatus) -> Color32 {
     match s {
-        RenderStatus::Done => Color32::from_rgb(0x6c, 0xc0, 0x6c),
+        RenderStatus::Done => t.text_dim,
         RenderStatus::Rendering => t.accent_hover,
         RenderStatus::Failed(_) | RenderStatus::NeedsOutput => t.danger,
         RenderStatus::UserStopped => t.warning,
