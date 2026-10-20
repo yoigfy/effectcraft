@@ -1,4 +1,4 @@
-//! TokEffect desktop app.
+//! TokCraft desktop app.
 //!
 //! Usage: `effectcraft [--control <port>] [--demo|--empty|--home] [--] [project.ecproj | media files…]`
 //!
@@ -7,7 +7,7 @@
 //! Without a project the app starts with an empty Untitled Project, as After Effects does;
 //! `--demo` opens the demo project instead (also Help ▸ Open Demo Project).
 //!
-//! `--control <port>` (or `EFFECTCRAFT_CONTROL_PORT`) starts a localhost JSON-lines control server;
+//! `--control <port>` (or `TOKCRAFT_CONTROL_PORT`) starts a localhost JSON-lines control server;
 //! see `effectcraft_ui_egui::control` for the methods.
 #![cfg_attr(all(target_os = "windows", not(debug_assertions)), windows_subsystem = "windows")]
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
@@ -31,8 +31,8 @@ mod window;
 use effectcraft_ui_egui::EffectcraftApp;
 use serde_json::json;
 
-/// TokEffect's app icon for the window, taskbar and Dock.
-const ICON_PNG: &[u8] = include_bytes!("../../../assets/app-icon/tokeffect.png");
+/// TokCraft's app icon for the window, taskbar and Dock.
+const ICON_PNG: &[u8] = include_bytes!("../../../assets/app-icon/tokcraft.png");
 
 fn app_icon() -> egui::IconData {
     let png: &[u8] = ICON_PNG;
@@ -67,7 +67,7 @@ struct Args {
 }
 
 /// Parse the arguments after the program name; `Ok(None)` for `--version`. `env_port` is
-/// `EFFECTCRAFT_CONTROL_PORT`, used when `--control` isn't given. An unknown option or a bad port
+/// `TOKCRAFT_CONTROL_PORT`, used when `--control` isn't given. An unknown option or a bad port
 /// is an error, so it is neither imported as a file nor dropped; after `--` every argument is a file.
 fn parse_args(args: impl IntoIterator<Item = String>, env_port: Result<String, std::env::VarError>) -> Result<Option<Args>, String> {
     let mut out = Args::default();
@@ -98,9 +98,9 @@ fn parse_args(args: impl IntoIterator<Item = String>, env_port: Result<String, s
     if out.control_port.is_none() {
         out.control_port = match env_port {
             Ok(v) if v.is_empty() => None,
-            Ok(v) => Some(control_port("EFFECTCRAFT_CONTROL_PORT", Some(&v))?),
+            Ok(v) => Some(control_port("TOKCRAFT_CONTROL_PORT", Some(&v))?),
             Err(std::env::VarError::NotPresent) => None,
-            Err(std::env::VarError::NotUnicode(v)) => Some(control_port("EFFECTCRAFT_CONTROL_PORT", Some(&v.to_string_lossy()))?),
+            Err(std::env::VarError::NotUnicode(v)) => Some(control_port("TOKCRAFT_CONTROL_PORT", Some(&v.to_string_lossy()))?),
         };
     }
     Ok(Some(out))
@@ -138,24 +138,24 @@ fn main() -> eframe::Result {
     // feed the compatibility report.
     effectcraft_engine::logging::install();
     effectcraft_engine::logging::install_panic_hook();
-    let Args { control_port, files, demo, home } = match parse_args(std::env::args().skip(1), std::env::var("EFFECTCRAFT_CONTROL_PORT")) {
+    let Args { control_port, files, demo, home } = match parse_args(std::env::args().skip(1), std::env::var("TOKCRAFT_CONTROL_PORT")) {
         Ok(Some(args)) => args,
         Ok(None) => {
-            println!("TokEffect {}", env!("CARGO_PKG_VERSION"));
+            println!("TokCraft {}", env!("CARGO_PKG_VERSION"));
             return Ok(());
         }
         // Before the session log, preferences and the window: nothing has started yet.
         Err(e) => {
-            eprintln!("TokEffect: {e}");
+            eprintln!("TokCraft: {e}");
             std::process::exit(1);
         }
     };
-    // The session log lives in the settings folder (`Logs/effectcraft.log`, the previous two runs
+    // The session log lives in the settings folder (`Logs/tokcraft.log`, the previous two runs
     // kept): a launch from the Dock or a menu has no terminal. Opened after the arguments, so
     // `--version` leaves no file behind; records logged until now are written to it first.
     if let Some(dir) = effectcraft_host::config_dir() {
         match effectcraft_engine::logging::attach_session_log(&effectcraft_engine::logging::log_dir(Some(&dir))) {
-            Ok(path) => log::info!("TokEffect {}, log file {}", env!("CARGO_PKG_VERSION"), path.display()),
+            Ok(path) => log::info!("TokCraft {}, log file {}", env!("CARGO_PKG_VERSION"), path.display()),
             Err(e) => log::warn!("no log file: {e}"),
         }
     }
@@ -171,7 +171,7 @@ fn main() -> eframe::Result {
     let notice = launch.notice.take();
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_title("TokEffect")
+            .with_title("TokCraft")
             .with_inner_size(window::DEFAULT_SIZE)
             .with_min_inner_size(window::MIN_SIZE)
             .with_drag_and_drop(true)
@@ -186,7 +186,7 @@ fn main() -> eframe::Result {
     };
     // Start-up milestones go to stderr and the session log, so a window that never appears
     // shows how far start-up got (#234).
-    log::info!("TokEffect {}: opening the window", env!("CARGO_PKG_VERSION"));
+    log::info!("TokCraft {}: opening the window", env!("CARGO_PKG_VERSION"));
     // Registered before the event loop starts, so it catches the Finder event that launched us as
     // well as later ones. Lives until the event loop returns; the app creator only borrows it.
     #[cfg(target_os = "macos")]
@@ -194,7 +194,7 @@ fn main() -> eframe::Result {
     #[cfg(target_os = "macos")]
     let apple_events = &apple_events;
     let result = eframe::run_native(
-        "TokEffect",
+        "TokCraft",
         options,
         Box::new(move |cc| {
             match &cc.wgpu_render_state {
@@ -202,7 +202,7 @@ fn main() -> eframe::Result {
                 None => log::info!("graphics: no wgpu device"),
             }
             // This executable owns the shared device's handlers. Install them before
-            // EffectCraft's compositor pipelines are built, without changing handlers from
+            // TokCraft's compositor pipelines are built, without changing handlers from
             // inside Gpu::new. eframe has already constructed its presentation renderer here.
             let gpu_failures = effectcraft_ui_egui::gpu_failure::GpuFailureBridge::new(&cc.egui_ctx);
             if let Some(rs) = &cc.wgpu_render_state {
@@ -275,26 +275,26 @@ fn main() -> eframe::Result {
                 rfd::FileDialog::new().add_filter("Media", exts).pick_files().unwrap_or_default().into_iter().map(|p| p.to_string_lossy().to_string()).collect()
             }));
             app.hooks.pick_save = Some(Box::new(|name: &str| {
-                rfd::FileDialog::new().add_filter("TokEffect Project", &["ecproj"]).set_file_name(name).save_file().map(|p| p.to_string_lossy().to_string())
+                rfd::FileDialog::new().add_filter("TokCraft Project", &["ecproj"]).set_file_name(name).save_file().map(|p| p.to_string_lossy().to_string())
             }));
             // The window closes after a lost graphics device (#591); say why, unless an agent drives
             // the app through the control channel.
             if control_port.is_none() {
                 app.hooks.device_lost = Some(Box::new(|saved: Option<Result<String, String>>| {
                     let saved = match saved {
-                        Some(Ok(path)) => format!("\n\nYour unsaved changes were saved to:\n{path}\n\nReopen TokEffect to recover them."),
+                        Some(Ok(path)) => format!("\n\nYour unsaved changes were saved to:\n{path}\n\nReopen TokCraft to recover them."),
                         Some(Err(e)) => format!("\n\nYour unsaved changes could not be saved ({e})."),
                         None => String::new(),
                     };
                     rfd::MessageDialog::new()
                         .set_level(rfd::MessageLevel::Error)
-                        .set_title("TokEffect: graphics device lost")
-                        .set_description(format!("The graphics driver stopped responding, so TokEffect has to close.{saved}"))
+                        .set_title("TokCraft: graphics device lost")
+                        .set_description(format!("The graphics driver stopped responding, so TokCraft has to close.{saved}"))
                         .show();
                 }));
             }
             app.hooks.pick_open_project = Some(Box::new(|| {
-                rfd::FileDialog::new().add_filter("TokEffect Project", &["ecproj", "ecprojx"]).pick_file().map(|p| p.to_string_lossy().to_string())
+                rfd::FileDialog::new().add_filter("TokCraft Project", &["ecproj", "ecprojx"]).pick_file().map(|p| p.to_string_lossy().to_string())
             }));
             app.hooks.system_theme = appearance::service();
             app.hooks.audio_device = Some(Box::new(audio_out::open));
@@ -366,7 +366,7 @@ fn wgpu_options(backends: Option<eframe::wgpu::Backends>) -> eframe::WgpuConfigu
         // `WGPU_VALIDATION_INDIRECT_CALL=1` turns the check back on.
         setup.instance_descriptor.flags = setup.instance_descriptor.flags.difference(eframe::wgpu::InstanceFlags::VALIDATION_INDIRECT_CALL).with_env();
         setup.device_descriptor = std::sync::Arc::new(|adapter| eframe::wgpu::DeviceDescriptor {
-            label: Some("TokEffect device"),
+            label: Some("TokCraft device"),
             required_limits: device_limits(adapter.limits()),
             ..Default::default()
         });
@@ -386,17 +386,17 @@ fn device_limits(adapter: eframe::wgpu::Limits) -> eframe::wgpu::Limits {
 fn startup_failed(e: &eframe::Error, gl_next: bool) {
     let next = if gl_next { "The next launch will try OpenGL instead. " } else { "" };
     let message = format!(
-        "TokEffect couldn't start its window: {e}\n\n{next}Updating the graphics driver often helps. If it keeps happening, please report it at https://github.com/storytold/effectcraft/issues with this message."
+        "TokCraft couldn't start its window: {e}\n\n{next}Updating the graphics driver often helps. If it keeps happening, please report it at https://github.com/storytold/effectcraft/issues with this message."
     );
     // Standard error and the session log; standard error alone when RUST_LOG turned errors off.
     if log::log_enabled!(log::Level::Error) {
         log::error!("{message}");
     } else {
-        eprintln!("TokEffect: {message}");
+        eprintln!("TokCraft: {message}");
     }
     let _ = rfd::MessageDialog::new()
         .set_level(rfd::MessageLevel::Error)
-        .set_title("TokEffect")
+        .set_title("TokCraft")
         .set_description(message)
         .set_buttons(rfd::MessageButtons::Ok)
         .show();
@@ -472,7 +472,7 @@ fn disable_app_nap() {
     {
         use objc2_foundation::{NSActivityOptions, NSProcessInfo, NSString};
         let info = NSProcessInfo::processInfo();
-        let reason = NSString::from_str("TokEffect control channel");
+        let reason = NSString::from_str("TokCraft control channel");
         let opts = NSActivityOptions::UserInitiatedAllowingIdleSystemSleep | NSActivityOptions::LatencyCritical;
         // Leaked on purpose: the activity lasts for the life of the process.
         std::mem::forget(info.beginActivityWithOptions_reason(opts, &reason));
@@ -590,11 +590,11 @@ mod tests {
         assert!(!a.demo);
     }
 
-    /// `--control` wins over `EFFECTCRAFT_CONTROL_PORT`; the variable is checked only when it is
+    /// `--control` wins over `TOKCRAFT_CONTROL_PORT`; the variable is checked only when it is
     /// used, so a bad value doesn't stop `--control` or `--version`.
     #[test]
     fn control_port_variable_is_checked_when_used() {
-        let need = "EFFECTCRAFT_CONTROL_PORT needs a port number from 1 to 65535";
+        let need = "TOKCRAFT_CONTROL_PORT needs a port number from 1 to 65535";
         assert_eq!(parse_env(&[], Ok("abc".into())).unwrap_err(), format!("{need}, not `abc`"));
         assert_eq!(parse_env(&[], Ok("0".into())).unwrap_err(), format!("{need}, not `0`"));
         assert_eq!(parse_env(&[], Ok(String::new())), Ok(Some(Args::default())));
