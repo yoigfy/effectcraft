@@ -1,10 +1,10 @@
 [package]
-name = "effectcraft"
-description = "TokEffect video editor and motion graphics app"
+name = "tokcraft"
+description = "TokCraft video editor and motion graphics app"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-default-run = "effectcraft"
+default-run = "tokcraft"
 
 [lints]
 workspace = true
@@ -32,7 +32,7 @@ log = { workspace = true }
 zbus = "5.19"
 
 [build-dependencies]
-# Create a Windows ICO from the project-owned TokEffect PNG, and embed Windows VERSIONINFO.
+# Create a Windows ICO from the project-owned TokCraft PNG, and embed Windows VERSIONINFO.
 winresource = "0.1"
 image = { workspace = true }
 
@@ -44,7 +44,7 @@ muda = { version = "0.21", default-features = false }
 objc2 = "0.6"
 # NSApplication hide / hide others / show all, and the pasteboard for Edit ▸ Paste in text fields.
 objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "NSApplication", "NSResponder", "NSPasteboard"] }
-# Finder double-click, Open With, Dock drops and `open -a EffectCraft x.ecproj` arrive as a
+# Finder double-click, Open With, Dock drops and `open -a TokCraft x.ecproj` arrive as a
 # kAEOpenDocuments Apple event, which winit 0.30 doesn't handle. This audited crate (also used by
 # PhotoCraft and PdfCraft) registers the handler (Objective-C interop needs unsafe, which our
 # workspace forbids) behind a safe API. Pinned exactly: review the diff before bumping.
