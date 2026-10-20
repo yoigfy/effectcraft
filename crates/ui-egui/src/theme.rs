@@ -10,10 +10,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ThemeKind {
-    Dark,
-    Darker,
     #[default]
     Dark,
+    Darker,
+    Light,
 }
 
 impl ThemeKind {
