@@ -279,6 +279,7 @@ fn vsplit(size: SplitSize, a: DockNode, b: DockNode) -> DockNode {
 /// Essential Graphics uses the Properties panel; Undocked Panels floats the panels over the
 /// Composition panel.
 pub const WORKSPACES: &[&str] = &[
+    "TokCraft",
     "Default",
     "Standard",
     "Small Screen",
@@ -318,6 +319,17 @@ pub fn workspace(name: &str) -> DockNode {
     use SplitSize::*;
     let right = |p: &[PanelKind], q: &[PanelKind]| vsplit(Ratio(0.45), tabs(p, 0), tabs(q, 0));
     match name {
+        // TokCraft's default workspace keeps the everyday areas visible and hides rarely used
+        // panels behind tabs: Project/Media, Composition/Layer, Controls and Timeline.
+        "TokCraft" => vsplit(
+            Ratio(0.64),
+            hsplit(
+                FixedA(250.0),
+                tabs(&[Project, MediaBrowser], 0),
+                hsplit(FixedB(280.0), tabs(&[Composition, Layer], 0), tabs(&[Properties, EffectControls, EffectsPresets, Preview], 0)),
+            ),
+            tabs(&[Timeline, RenderQueue], 0),
+        ),
         "Animation" => vsplit(
             Ratio(0.55),
             hsplit(
