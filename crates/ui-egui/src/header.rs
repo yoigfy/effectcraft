@@ -23,15 +23,15 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
     let mut x = rect.min.x + if app.integrated_titlebar && !app.ui.show_menu_bar { 80.0 } else { 10.0 };
 
     // Text-only wordmark keeps the product name clear without borrowing brand artwork.
-    let brand = Rect::from_min_size(pos2(x, cy - 12.0), vec2(70.0, 24.0));
-    p.text(brand.left_center(), Align2::LEFT_CENTER, "TokEffect", Tokens::semibold(16.0), t.text);
+    let brand = Rect::from_min_size(pos2(x, cy - 12.0), vec2(82.0, 24.0));
+    p.text(brand.left_center(), Align2::LEFT_CENTER, "TokCraft", Tokens::semibold(16.0), t.text);
     let bresp = ui.interact(brand, egui::Id::new("brand"), Sense::click());
-    app.auto.add_response("header.about", &bresp, "About TokEffect");
+    app.auto.add_response("header.about", &bresp, "About TokCraft");
     widgets::focus_outline(ui, &bresp, &t);
-    if bresp.on_hover_text(tr("About TokEffect")).clicked() {
+    if bresp.on_hover_text(tr("About TokCraft")).clicked() {
         app.dialog = Some(Dialog::About);
     }
-    x += 76.0;
+    x += 88.0;
 
     // Home.
     let home = Rect::from_min_size(pos2(x, cy - 13.0), vec2(26.0, 26.0));
