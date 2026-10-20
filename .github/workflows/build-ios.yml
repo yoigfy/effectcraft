@@ -1,0 +1,173 @@
+name: Build Tokeffects for iOS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-ios.yml"
+      - "ios/**"
+      - "apps/effectcraft-web/**"
+      - "crates/**"
+      - "assets/app-icon/tokeffects.png"
+      - "xtask/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tokeffects-ios-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Tokeffects iOS IPA
+    runs-on: macos-15
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Rust and WebAssembly target
+        uses: actions-rust-lang/setup-rust-toolchain@v2
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: Install web and Xcode project tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew list binaryen >/dev/null 2>&1 || brew install binaryen
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          if ! command -v wasm-bindgen >/dev/null || ! wasm-bindgen --version | grep -qF "0.2.129"; then
+            cargo install wasm-bindgen-cli --version 0.2.129 --locked
+          fi
+          xcodebuild -version
+          xcodegen --version
+          wasm-bindgen --version
+
+      - name: Build optimized browser editor
+        run: cargo xtask web
+        env:
+          CARGO_BUILD_JOBS: "3"
+
+      - name: Bundle web editor and Tokeffects app icon
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s target/web/dist/index.html
+          test -s target/web/dist/effectcraft_web_bg.wasm
+          rm -rf ios/Tokeffects/Resources/web
+          mkdir -p ios/Tokeffects/Resources/web ios/Tokeffects/Assets.xcassets/AppIcon.appiconset
+          cp -R target/web/dist/. ios/Tokeffects/Resources/web/
+          sips -s format png -z 1024 1024 assets/app-icon/tokeffects.png \
+            --out ios/Tokeffects/Assets.xcassets/AppIcon.appiconset/AppIcon.png >/dev/null
+          test -s ios/Tokeffects/Assets.xcassets/AppIcon.appiconset/AppIcon.png
+
+      - name: Generate Xcode project
+        run: xcodegen generate --spec ios/Tokeffects/Project.yml
+
+      - name: Build and package IPA
+        shell: bash
+        env:
+          IOS_CERTIFICATE_P12_BASE64: ${{ secrets.IOS_CERTIFICATE_P12_BASE64 }}
+          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist build
+
+          if [[ -n "${IOS_CERTIFICATE_P12_BASE64:-}" && \
+                -n "${IOS_CERTIFICATE_PASSWORD:-}" && \
+                -n "${IOS_PROVISIONING_PROFILE_BASE64:-}" && \
+                -n "${IOS_TEAM_ID:-}" ]]; then
+            KEYCHAIN_PATH="$RUNNER_TEMP/tokeffects-ios.keychain-db"
+            KEYCHAIN_PASSWORD="$(openssl rand -base64 24)"
+            security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+            security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+            security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+            security list-keychains -d user -s "$KEYCHAIN_PATH" "$(security default-keychain -d user | tr -d '"')"
+
+            printf '%s' "$IOS_CERTIFICATE_P12_BASE64" | base64 --decode > "$RUNNER_TEMP/tokeffects-cert.p12"
+            security import "$RUNNER_TEMP/tokeffects-cert.p12" -f pkcs12 -P "$IOS_CERTIFICATE_PASSWORD" -A -k "$KEYCHAIN_PATH"
+            security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+            printf '%s' "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$RUNNER_TEMP/tokeffects.mobileprovision"
+            security cms -D -i "$RUNNER_TEMP/tokeffects.mobileprovision" > "$RUNNER_TEMP/tokeffects-profile.plist"
+            PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print UUID' "$RUNNER_TEMP/tokeffects-profile.plist")
+            PROFILE_NAME=$(/usr/libexec/PlistBuddy -c 'Print Name' "$RUNNER_TEMP/tokeffects-profile.plist")
+            mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+            cp "$RUNNER_TEMP/tokeffects.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$PROFILE_UUID.mobileprovision"
+
+            xcodebuild \
+              -project ios/Tokeffects/Tokeffects.xcodeproj \
+              -scheme Tokeffects \
+              -configuration Release \
+              -destination 'generic/platform=iOS' \
+              -archivePath "$PWD/build/Tokeffects.xcarchive" \
+              -derivedDataPath "$PWD/build/DerivedData" \
+              CODE_SIGN_STYLE=Manual \
+              CODE_SIGN_IDENTITY="Apple Distribution" \
+              DEVELOPMENT_TEAM="$IOS_TEAM_ID" \
+              PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
+              archive
+
+            cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>ad-hoc</string>
+            <key>teamID</key><string>$IOS_TEAM_ID</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key><dict>
+              <key>com.tokeffects.editor</key><string>$PROFILE_NAME</string>
+            </dict>
+          </dict></plist>
+          EOF
+            xcodebuild -exportArchive \
+              -archivePath "$PWD/build/Tokeffects.xcarchive" \
+              -exportPath "$PWD/build/export" \
+              -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+            cp build/export/Tokeffects.ipa dist/Tokeffects-iOS.ipa
+            printf 'Signed ad-hoc IPA. Only devices in its provisioning profile can install it.\n' > dist/signing-status.txt
+          else
+            xcodebuild \
+              -project ios/Tokeffects/Tokeffects.xcodeproj \
+              -scheme Tokeffects \
+              -configuration Release \
+              -sdk iphoneos \
+              -destination 'generic/platform=iOS' \
+              -derivedDataPath "$PWD/build/DerivedData" \
+              CODE_SIGNING_ALLOWED=NO \
+              build
+
+            APP_PATH="build/DerivedData/Build/Products/Release-iphoneos/Tokeffects.app"
+            test -d "$APP_PATH"
+            mkdir -p build/ipa/Payload
+            cp -R "$APP_PATH" build/ipa/Payload/Tokeffects.app
+            /usr/bin/ditto -c -k --sequesterRsrc --keepParent build/ipa/Payload dist/Tokeffects-iOS-unsigned.ipa
+            printf 'Unsigned IPA. Configure the Apple signing secrets in ios/README.md to produce a device-installable ad-hoc IPA.\n' > dist/signing-status.txt
+          fi
+
+          ls -lh dist/*.ipa
+          test -s dist/signing-status.txt
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Tokeffects-iOS-IPA
+          path: |
+            dist/*.ipa
+            dist/signing-status.txt
+          if-no-files-found: error
+          retention-days: 14
