@@ -61,6 +61,20 @@ fn main() {
         return;
     }
 
+    // Publish a stable copy in the active profile directory for the installer workflow.
+    // OUT_DIR is target/<profile>/build/<package-hash>/out, so the third ancestor is
+    // target/<profile>. This keeps the generated artifact out of the source tree.
+    if let Some(profile_dir) = out_dir.ancestors().nth(3) {
+        let published_ico = profile_dir.join("tokeffects.ico");
+        if let Err(error) = fs::copy(&ico_path, &published_ico) {
+            println!("cargo:error=Could not publish Tokeffects ICO to {}: {error}", published_ico.display());
+            if env::var_os("TOKEEFFECTS_REQUIRE_WINRES").is_some() {
+                panic!("publishing Tokeffects ICO for the installer failed: {error}");
+            }
+            return;
+        }
+    }
+
     let version = env::var("CARGO_PKG_VERSION").unwrap_or_else(|_| "0.0.0".to_string());
     let icon_path = ico_path.to_string_lossy().into_owned();
     let mut resource = winresource::WindowsResource::new();
