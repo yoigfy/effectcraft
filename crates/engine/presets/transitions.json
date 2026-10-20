@@ -8,7 +8,21 @@
       "category": "Transitions",
       "direction": "in",
       "description": "The layer fades up from transparent over half a second.",
-      "layer": { "keys": { "transform/opacity": [[0, 0], [0.5, 100]] }, "ease": true }
+      "layer": {
+        "keys": {
+          "transform/opacity": [
+            [
+              0,
+              0
+            ],
+            [
+              0.5,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      }
     },
     {
       "id": "fadeOut",
@@ -16,7 +30,21 @@
       "category": "Transitions",
       "direction": "out",
       "description": "The layer fades down to transparent over half a second.",
-      "layer": { "keys": { "transform/opacity": [[0, 100], [0.5, 0]] }, "ease": true }
+      "layer": {
+        "keys": {
+          "transform/opacity": [
+            [
+              0,
+              100
+            ],
+            [
+              0.5,
+              0
+            ]
+          ]
+        },
+        "ease": true
+      }
     },
     {
       "id": "wipeInFromLeft",
@@ -25,7 +53,26 @@
       "direction": "in",
       "description": "A soft edge sweeps across from the left and reveals the layer.",
       "effects": [
-        { "effect": "ec.transition.linearwipe", "set": { "angle": 270, "feather": 40 }, "keys": { "completion": [[0, 100], [1, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.linearwipe",
+          "set": {
+            "angle": 270,
+            "feather": 40
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -35,7 +82,26 @@
       "direction": "in",
       "description": "A soft edge sweeps across from the right and reveals the layer.",
       "effects": [
-        { "effect": "ec.transition.linearwipe", "set": { "angle": 90, "feather": 40 }, "keys": { "completion": [[0, 100], [1, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.linearwipe",
+          "set": {
+            "angle": 90,
+            "feather": 40
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -45,7 +111,26 @@
       "direction": "in",
       "description": "The layer is revealed from the top edge downwards.",
       "effects": [
-        { "effect": "ec.transition.linearwipe", "set": { "angle": 0, "feather": 30 }, "keys": { "completion": [[0, 100], [0.9, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.linearwipe",
+          "set": {
+            "angle": 0,
+            "feather": 30
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                0.9,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -55,7 +140,26 @@
       "direction": "in",
       "description": "The layer is revealed from the bottom edge upwards.",
       "effects": [
-        { "effect": "ec.transition.linearwipe", "set": { "angle": 180, "feather": 30 }, "keys": { "completion": [[0, 100], [0.9, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.linearwipe",
+          "set": {
+            "angle": 180,
+            "feather": 30
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                0.9,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -65,7 +169,26 @@
       "direction": "in",
       "description": "A wide, very soft edge sweeps in from the bottom-left corner.",
       "effects": [
-        { "effect": "ec.transition.linearwipe", "set": { "angle": 45, "feather": 160 }, "keys": { "completion": [[0, 100], [1.2, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.linearwipe",
+          "set": {
+            "angle": 45,
+            "feather": 160
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1.2,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -75,7 +198,26 @@
       "direction": "out",
       "description": "A soft edge travels left to right and takes the layer away.",
       "effects": [
-        { "effect": "ec.transition.linearwipe", "set": { "angle": 90, "feather": 40 }, "keys": { "completion": [[0, 0], [1, 100]] }, "ease": true }
+        {
+          "effect": "ec.transition.linearwipe",
+          "set": {
+            "angle": 90,
+            "feather": 40
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                100
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -85,7 +227,26 @@
       "direction": "in",
       "description": "A clock hand sweeps once around the centre and reveals the layer.",
       "effects": [
-        { "effect": "ec.transition.radialwipe", "set": { "wipe": 1, "feather": 6 }, "keys": { "completion": [[0, 100], [1.2, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.radialwipe",
+          "set": {
+            "wipe": 1,
+            "feather": 6
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1.2,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -95,7 +256,27 @@
       "direction": "in",
       "description": "The layer opens like a fan, from the top down both sides.",
       "effects": [
-        { "effect": "ec.transition.radialwipe", "set": { "wipe": 2, "startAngle": 180, "feather": 10 }, "keys": { "completion": [[0, 100], [1, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.radialwipe",
+          "set": {
+            "wipe": 2,
+            "startAngle": 180,
+            "feather": 10
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -105,7 +286,25 @@
       "direction": "out",
       "description": "A clock hand sweeps once around the centre and removes the layer.",
       "effects": [
-        { "effect": "ec.transition.radialwipe", "set": { "feather": 6 }, "keys": { "completion": [[0, 0], [1.2, 100]] }, "ease": true }
+        {
+          "effect": "ec.transition.radialwipe",
+          "set": {
+            "feather": 6
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                0
+              ],
+              [
+                1.2,
+                100
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -115,7 +314,27 @@
       "direction": "in",
       "description": "Vertical slats widen until the layer is whole.",
       "effects": [
-        { "effect": "ec.transition.venetian", "set": { "direction": 0, "width": 60, "feather": 4 }, "keys": { "completion": [[0, 100], [0.9, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.venetian",
+          "set": {
+            "direction": 0,
+            "width": 60,
+            "feather": 4
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                0.9,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -125,7 +344,26 @@
       "direction": "in",
       "description": "Horizontal slats thicken until the layer is whole.",
       "effects": [
-        { "effect": "ec.transition.venetian", "set": { "direction": 90, "width": 36, "feather": 3 }, "keys": { "completion": [[0, 100], [0.8, 0]] } }
+        {
+          "effect": "ec.transition.venetian",
+          "set": {
+            "direction": 90,
+            "width": 36,
+            "feather": 3
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                0.8,
+                0
+              ]
+            ]
+          }
+        }
       ]
     },
     {
@@ -135,7 +373,27 @@
       "direction": "out",
       "description": "Vertical slats narrow until the layer is gone.",
       "effects": [
-        { "effect": "ec.transition.venetian", "set": { "direction": 0, "width": 60, "feather": 4 }, "keys": { "completion": [[0, 0], [0.9, 100]] }, "ease": true }
+        {
+          "effect": "ec.transition.venetian",
+          "set": {
+            "direction": 0,
+            "width": 60,
+            "feather": 4
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                0
+              ],
+              [
+                0.9,
+                100
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -147,8 +405,23 @@
       "effects": [
         {
           "effect": "ec.transition.blockdissolve",
-          "set": { "blockWidth": 6, "blockHeight": 6, "softEdges": false },
-          "keys": { "completion": [[0, 100], [1.2, 0]] }
+          "set": {
+            "blockWidth": 6,
+            "blockHeight": 6,
+            "softEdges": false
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1.2,
+                0
+              ]
+            ]
+          }
         }
       ]
     },
@@ -161,8 +434,23 @@
       "effects": [
         {
           "effect": "ec.transition.blockdissolve",
-          "set": { "blockWidth": 48, "blockHeight": 48, "feather": 16 },
-          "keys": { "completion": [[0, 100], [1.2, 0]] },
+          "set": {
+            "blockWidth": 48,
+            "blockHeight": 48,
+            "feather": 16
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1.2,
+                0
+              ]
+            ]
+          },
           "ease": true
         }
       ]
@@ -176,8 +464,23 @@
       "effects": [
         {
           "effect": "ec.transition.blockdissolve",
-          "set": { "blockWidth": 6, "blockHeight": 6, "softEdges": false },
-          "keys": { "completion": [[0, 0], [1.2, 100]] }
+          "set": {
+            "blockWidth": 6,
+            "blockHeight": 6,
+            "softEdges": false
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                0
+              ],
+              [
+                1.2,
+                100
+              ]
+            ]
+          }
         }
       ]
     },
@@ -190,8 +493,25 @@
       "effects": [
         {
           "effect": "ec.transition.cardwipe",
-          "set": { "rows": 4, "columns": 8, "flipAxis": 1, "flipOrder": 1, "transitionWidth": 70 },
-          "keys": { "completion": [[0, 100], [1.4, 0]] },
+          "set": {
+            "rows": 4,
+            "columns": 8,
+            "flipAxis": 1,
+            "flipOrder": 1,
+            "transitionWidth": 70
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1.4,
+                0
+              ]
+            ]
+          },
           "ease": true
         }
       ]
@@ -205,8 +525,24 @@
       "effects": [
         {
           "effect": "ec.transition.cardwipe",
-          "set": { "rows": 4, "columns": 8, "flipAxis": 1, "transitionWidth": 70 },
-          "keys": { "completion": [[0, 0], [1.4, 100]] },
+          "set": {
+            "rows": 4,
+            "columns": 8,
+            "flipAxis": 1,
+            "transitionWidth": 70
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                0
+              ],
+              [
+                1.4,
+                100
+              ]
+            ]
+          },
           "ease": true
         }
       ]
@@ -218,7 +554,27 @@
       "direction": "in",
       "description": "Tiles open like small doors from the centre outwards.",
       "effects": [
-        { "effect": "ec.transition.ccgridwipe", "set": { "shape": 0, "tiles": 12, "reverse": true }, "keys": { "completion": [[0, 100], [1, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.ccgridwipe",
+          "set": {
+            "shape": 0,
+            "tiles": 12,
+            "reverse": true
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -228,7 +584,25 @@
       "direction": "in",
       "description": "The layer grows out of a circle that stretches the picture outwards.",
       "effects": [
-        { "effect": "ec.transition.ccradialscalewipe", "set": { "reverse": true }, "keys": { "completion": [[0, 100], [1, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.ccradialscalewipe",
+          "set": {
+            "reverse": true
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
       ]
     },
     {
@@ -238,7 +612,26 @@
       "direction": "in",
       "description": "A stepped, slanted edge sweeps in from the lower left.",
       "effects": [
-        { "effect": "ec.transition.cclinesweep", "set": { "direction": 90, "thickness": 30, "slant": 30 }, "keys": { "completion": [[0, 100], [1, 0]] } }
+        {
+          "effect": "ec.transition.cclinesweep",
+          "set": {
+            "direction": 90,
+            "thickness": 30,
+            "slant": 30
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          }
+        }
       ]
     },
     {
@@ -248,7 +641,639 @@
       "direction": "in",
       "description": "Toothed edges close in from the top and bottom until the layer is whole.",
       "effects": [
-        { "effect": "ec.transition.ccjaws", "set": { "shape": 2, "height": 30, "width": 40 }, "keys": { "completion": [[0, 100], [1, 0]] }, "ease": true }
+        {
+          "effect": "ec.transition.ccjaws",
+          "set": {
+            "shape": 2,
+            "height": 30,
+            "width": 40
+          },
+          "keys": {
+            "completion": [
+              [
+                0,
+                100
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
+      ]
+    },
+    {
+      "id": "quickZoomHit",
+      "name": "Quick Zoom Hit",
+      "category": "Motion",
+      "description": "A short, punchy scale hit with a restrained highlight flash.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/scale": [
+            [
+              0,
+              100
+            ],
+            [
+              0.055,
+              136
+            ],
+            [
+              0.12,
+              113
+            ],
+            [
+              0.22,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      },
+      "effects": [
+        {
+          "effect": "ec.color.brightnesscontrast",
+          "set": {
+            "useLegacy": false
+          },
+          "keys": {
+            "brightness": [
+              [
+                0,
+                0
+              ],
+              [
+                0.045,
+                72
+              ],
+              [
+                0.12,
+                0
+              ]
+            ],
+            "contrast": [
+              [
+                0,
+                0
+              ],
+              [
+                0.045,
+                24
+              ],
+              [
+                0.12,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
+      ]
+    },
+    {
+      "id": "softImpact",
+      "name": "Soft Impact",
+      "category": "Motion",
+      "description": "A gentle, springy zoom for a subtle impact.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/scale": [
+            [
+              0,
+              100
+            ],
+            [
+              0.09,
+              111
+            ],
+            [
+              0.19,
+              104
+            ],
+            [
+              0.32,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      }
+    },
+    {
+      "id": "impactShake",
+      "name": "Impact Shake",
+      "category": "Motion",
+      "description": "A compact multi-direction shake that settles quickly.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/position": [
+            [
+              0,
+              [
+                0.5,
+                0.5
+              ]
+            ],
+            [
+              0.035,
+              [
+                0.535,
+                0.475
+              ]
+            ],
+            [
+              0.07,
+              [
+                0.465,
+                0.52
+              ]
+            ],
+            [
+              0.105,
+              [
+                0.525,
+                0.49
+              ]
+            ],
+            [
+              0.145,
+              [
+                0.485,
+                0.515
+              ]
+            ],
+            [
+              0.21,
+              [
+                0.5,
+                0.5
+              ]
+            ]
+          ],
+          "transform/scale": [
+            [
+              0,
+              112
+            ],
+            [
+              0.07,
+              116
+            ],
+            [
+              0.16,
+              105
+            ],
+            [
+              0.24,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      }
+    },
+    {
+      "id": "verticalShake",
+      "name": "Vertical Shake",
+      "category": "Motion",
+      "description": "A fast vertical shake with a small zoom cushion.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/position": [
+            [
+              0,
+              [
+                0.5,
+                0.5
+              ]
+            ],
+            [
+              0.035,
+              [
+                0.5,
+                0.455
+              ]
+            ],
+            [
+              0.075,
+              [
+                0.5,
+                0.54
+              ]
+            ],
+            [
+              0.115,
+              [
+                0.5,
+                0.47
+              ]
+            ],
+            [
+              0.16,
+              [
+                0.5,
+                0.515
+              ]
+            ],
+            [
+              0.22,
+              [
+                0.5,
+                0.5
+              ]
+            ]
+          ],
+          "transform/scale": [
+            [
+              0,
+              108
+            ],
+            [
+              0.08,
+              112
+            ],
+            [
+              0.2,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      }
+    },
+    {
+      "id": "spinHit",
+      "name": "Spin Hit",
+      "category": "Motion",
+      "description": "A quick rotational hit that snaps back into place.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/rotation": [
+            [
+              0,
+              0
+            ],
+            [
+              0.055,
+              9
+            ],
+            [
+              0.12,
+              -6
+            ],
+            [
+              0.19,
+              2
+            ],
+            [
+              0.26,
+              0
+            ]
+          ],
+          "transform/scale": [
+            [
+              0,
+              100
+            ],
+            [
+              0.07,
+              118
+            ],
+            [
+              0.18,
+              104
+            ],
+            [
+              0.26,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      }
+    },
+    {
+      "id": "flashImpact",
+      "name": "Flash Impact",
+      "category": "Motion",
+      "description": "A brief brightness flash over a small zoom impact.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/scale": [
+            [
+              0,
+              100
+            ],
+            [
+              0.06,
+              121
+            ],
+            [
+              0.16,
+              105
+            ],
+            [
+              0.25,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      },
+      "effects": [
+        {
+          "effect": "ec.color.brightnesscontrast",
+          "set": {
+            "useLegacy": false
+          },
+          "keys": {
+            "brightness": [
+              [
+                0,
+                0
+              ],
+              [
+                0.025,
+                100
+              ],
+              [
+                0.085,
+                0
+              ]
+            ],
+            "contrast": [
+              [
+                0,
+                0
+              ],
+              [
+                0.025,
+                35
+              ],
+              [
+                0.085,
+                0
+              ]
+            ]
+          },
+          "ease": true
+        }
+      ]
+    },
+    {
+      "id": "fastPushIn",
+      "name": "Fast Push In",
+      "category": "Motion",
+      "description": "A fast push toward the subject that eases back to a clean frame.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/scale": [
+            [
+              0,
+              100
+            ],
+            [
+              0.12,
+              128
+            ],
+            [
+              0.3,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      }
+    },
+    {
+      "id": "zoomPunchOut",
+      "name": "Zoom Punch Out",
+      "category": "Motion",
+      "description": "A quick pull-back with a short overshoot.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/scale": [
+            [
+              0,
+              132
+            ],
+            [
+              0.09,
+              96
+            ],
+            [
+              0.17,
+              103
+            ],
+            [
+              0.25,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      }
+    },
+    {
+      "id": "bouncePop",
+      "name": "Bounce Pop",
+      "category": "Motion",
+      "description": "A lively scale pop with a small overshoot and settle.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/scale": [
+            [
+              0,
+              72
+            ],
+            [
+              0.12,
+              114
+            ],
+            [
+              0.23,
+              94
+            ],
+            [
+              0.34,
+              103
+            ],
+            [
+              0.46,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      }
+    },
+    {
+      "id": "snapSlideIn",
+      "name": "Snap Slide In",
+      "category": "Motion",
+      "description": "A quick lateral slide with a short overshoot before settling.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/position": [
+            [
+              0,
+              [
+                0.2,
+                0.5
+              ]
+            ],
+            [
+              0.12,
+              [
+                0.54,
+                0.5
+              ]
+            ],
+            [
+              0.19,
+              [
+                0.485,
+                0.5
+              ]
+            ],
+            [
+              0.27,
+              [
+                0.5,
+                0.5
+              ]
+            ]
+          ],
+          "transform/opacity": [
+            [
+              0,
+              0
+            ],
+            [
+              0.07,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      }
+    },
+    {
+      "id": "tiltPunch",
+      "name": "Tilt Punch",
+      "category": "Motion",
+      "description": "A small tilt and zoom accent for energetic edits.",
+      "direction": "hit",
+      "layer": {
+        "keys": {
+          "transform/rotation": [
+            [
+              0,
+              0
+            ],
+            [
+              0.06,
+              -5
+            ],
+            [
+              0.13,
+              3
+            ],
+            [
+              0.21,
+              0
+            ]
+          ],
+          "transform/scale": [
+            [
+              0,
+              100
+            ],
+            [
+              0.08,
+              114
+            ],
+            [
+              0.2,
+              100
+            ]
+          ]
+        },
+        "ease": true
+      }
+    },
+    {
+      "id": "flickerHit",
+      "name": "Flicker Hit",
+      "category": "Motion",
+      "description": "A short, controlled exposure flicker for beat-synced edits.",
+      "direction": "hit",
+      "effects": [
+        {
+          "effect": "ec.color.brightnesscontrast",
+          "set": {
+            "useLegacy": false
+          },
+          "keys": {
+            "brightness": [
+              [
+                0,
+                0
+              ],
+              [
+                0.025,
+                58
+              ],
+              [
+                0.055,
+                -18
+              ],
+              [
+                0.09,
+                32
+              ],
+              [
+                0.14,
+                0
+              ]
+            ],
+            "contrast": [
+              [
+                0,
+                0
+              ],
+              [
+                0.025,
+                16
+              ],
+              [
+                0.055,
+                4
+              ],
+              [
+                0.09,
+                12
+              ],
+              [
+                0.14,
+                0
+              ]
+            ]
+          },
+          "ease": false
+        }
       ]
     }
   ]
