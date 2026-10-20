@@ -1,9 +1,9 @@
-//! Menu labels for EffectCraft's own engine tree in each translated language. Commands remain
+//! Menu labels for TokCraft's own engine tree in each translated language. Commands remain
 //! locale-independent. A command plus its source label distinguishes parameterised entries (e.g.
 //! blend modes). Empty command keys identify submenus. Dynamic filenames, user names and effect
 //! plug-in names remain verbatim; these catalogs only translate the fixed menu tree.
 
-use crate::EffectcraftApp;
+use crate::TokCraftApp;
 
 /// Effect names, keyed by effect id (#821).
 pub(crate) mod effects;
@@ -17,7 +17,7 @@ const CATALOG_CODES: [&str; 10] = ["ja", "zh-hans", "zh-hant", "uk", "es", "pt-b
 
 /// The active interface language: the stored preference when it names a catalog, otherwise `en`
 /// (English is the source of every label and needs no lookup).
-pub(crate) fn language(app: &EffectcraftApp) -> &'static str {
+pub(crate) fn language(app: &TokCraftApp) -> &'static str {
     match app.session.prefs.general.language.as_str() {
         "system" => system_language(),
         stored => code(stored),
@@ -30,42 +30,42 @@ fn code(stored: &str) -> &'static str {
 }
 
 /// The UI is in Japanese: the fast path for the menu builders.
-pub(crate) fn japanese(app: &EffectcraftApp) -> bool {
+pub(crate) fn japanese(app: &TokCraftApp) -> bool {
     language(app) == "ja"
 }
 
 /// The UI is in Simplified Chinese.
-pub(crate) fn simplified(app: &EffectcraftApp) -> bool {
+pub(crate) fn simplified(app: &TokCraftApp) -> bool {
     language(app) == "zh-hans"
 }
 
 /// The UI is in Traditional Chinese.
-pub(crate) fn traditional(app: &EffectcraftApp) -> bool {
+pub(crate) fn traditional(app: &TokCraftApp) -> bool {
     language(app) == "zh-hant"
 }
 
 /// The UI is in Ukrainian.
-pub(crate) fn ukrainian(app: &EffectcraftApp) -> bool {
+pub(crate) fn ukrainian(app: &TokCraftApp) -> bool {
     language(app) == "uk"
 }
 
 /// The UI is in Spanish.
-pub(crate) fn spanish(app: &EffectcraftApp) -> bool {
+pub(crate) fn spanish(app: &TokCraftApp) -> bool {
     language(app) == "es"
 }
 
 /// The UI is in Brazilian Portuguese.
-pub(crate) fn brazilian_portuguese(app: &EffectcraftApp) -> bool {
+pub(crate) fn brazilian_portuguese(app: &TokCraftApp) -> bool {
     language(app) == "pt-br"
 }
 
 /// The UI is in Czech.
-pub(crate) fn czech(app: &EffectcraftApp) -> bool {
+pub(crate) fn czech(app: &TokCraftApp) -> bool {
     language(app) == "cs"
 }
 
 /// Settings ▸ General ▸ Language ▸ Match System: the operating system's interface language
-/// where EffectCraft has it, else English (#229), as After Effects installs in the system's
+/// where TokCraft has it, else English (#229), as After Effects installs in the system's
 /// language. The browser build stays in English because it has no system-locale probe.
 fn system_language() -> &'static str {
     #[cfg(not(target_arch = "wasm32"))]
@@ -78,7 +78,7 @@ fn system_language() -> &'static str {
     supported(None)
 }
 
-/// The language EffectCraft shows for a BCP 47 locale (`ja-JP` → `ja`, `zh-Hans-CN` → `zh-hans`,
+/// The language TokCraft shows for a BCP 47 locale (`ja-JP` → `ja`, `zh-Hans-CN` → `zh-hans`,
 /// `zh-TW` → `zh-hant`, `uk-UA` → `uk`, `es-ES` → `es`, `pt-BR` → `pt-br`, `cs-CZ` → `cs`).
 fn supported(locale: Option<&str>) -> &'static str {
     let Some(locale) = locale else { return "en" };
@@ -100,7 +100,7 @@ fn supported(locale: Option<&str>) -> &'static str {
     }
 }
 
-pub(crate) fn label<'a>(app: &EffectcraftApp, command: &str, source: &'a str) -> &'a str {
+pub(crate) fn label<'a>(app: &TokCraftApp, command: &str, source: &'a str) -> &'a str {
     let language = language(app);
     // The engine names the platform's file manager before the catalog sees the label. These
     // two commands keep their ids, but on Windows/Linux their source is no longer "Finder".
@@ -171,7 +171,7 @@ pub(crate) fn context_item(command: &str, params: &serde_json::Value, source: &s
         .map_or_else(|| tr(source).to_string(), |(_, _, translated)| (*translated).to_string())
 }
 
-pub(crate) fn entry(app: &EffectcraftApp, e: &MenuEntry, shown: String) -> String {
+pub(crate) fn entry(app: &TokCraftApp, e: &MenuEntry, shown: String) -> String {
     // The generated Effect menu's entries label themselves with the effect's registry name; the
     // catalog replaces it with the interface language's (#821). The entry keeps its command and
     // its `{"effect": <id>}` params, so a script, an expression or the control channel is
@@ -221,7 +221,7 @@ pub(crate) fn effect_category(children: &[MenuNode], source: &str) -> Option<Str
     (!children.is_empty() && children.iter().all(|c| matches!(c, MenuNode::Item(e) if e.command == "effect.apply"))).then(|| effects::category(source))
 }
 
-pub(crate) fn submenu(app: &EffectcraftApp, source: &str, shown: String) -> String {
+pub(crate) fn submenu(app: &TokCraftApp, source: &str, shown: String) -> String {
     match language(app) {
         "cs" => {
             if source == "Assign Shortcut to Workspace" {
@@ -310,8 +310,8 @@ pub(crate) fn submenu(app: &EffectcraftApp, source: &str, shown: String) -> Stri
 /// Chinese After Effects documentation and the catalogs the sibling Craft apps ship; see the
 /// pull request for the rows taken from #321.
 const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
-    ("", "TokEffect", "TokEffect"),
-    ("app.about", "About TokEffect...", "关于 TokEffect..."),
+    ("", "TokCraft", "TokCraft"),
+    ("app.about", "About TokCraft...", "关于 TokCraft..."),
     ("", "Settings...", "设置..."),
     ("app.settings", "General...", "常规..."),
     ("app.settings", "Startup & Repair...", "启动和修复..."),
@@ -330,10 +330,10 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
     ("app.settings", "Video...", "视频..."),
     ("app.settings", "3D...", "3D..."),
     ("app.settings", "Scripting & Expressions...", "脚本和表达式..."),
-    ("app.hide", "Hide TokEffect", "隐藏 TokEffect"),
+    ("app.hide", "Hide TokCraft", "隐藏 TokCraft"),
     ("app.hideOthers", "Hide Others", "隐藏其他"),
     ("app.showAll", "Show All", "全部显示"),
-    ("app.quit", "Quit TokEffect", "退出 TokEffect"),
+    ("app.quit", "Quit TokCraft", "退出 TokCraft"),
     ("", "File", "文件"),
     ("", "New", "新建"),
     ("file.newProject", "New Project", "新建项目"),
@@ -356,7 +356,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
     ("file.import", "File...", "文件..."),
     ("file.importMultiple", "Multiple Files...", "多个文件..."),
     ("file.importTimeline", "Adobe Premiere Pro Project...", "Adobe Premiere Pro 项目..."),
-    ("file.importProject", "TokEffect Project...", "TokEffect 项目..."),
+    ("file.importProject", "TokCraft Project...", "TokCraft 项目..."),
     ("file.importPlaceholder", "Placeholder...", "占位符..."),
     ("file.importSolid", "Solid...", "纯色..."),
     ("file.importLottie", "Lottie...", "Lottie..."),
@@ -921,7 +921,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
     ("window.panel", "Create Nulls From Paths", "从路径创建空对象"),
     ("window.panel", "VR Comp Editor", "VR 合成编辑器"),
     ("", "Help", "帮助"),
-    ("help.docs", "TokEffect Help...", "TokEffect 帮助..."),
+    ("help.docs", "TokCraft Help...", "TokCraft 帮助..."),
     ("help.docs", "Scripting Help...", "脚本帮助..."),
     ("help.docs", "Expression Reference...", "表达式引用..."),
     ("help.docs", "Effect Reference...", "效果参考..."),
@@ -935,8 +935,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
     ("help.discord", "Join the ArtCraft Discord...", "加入 ArtCraft 的 Discord 社区..."),
     ("help.reportIssue", "Provide Feedback...", "提供反馈..."),
     ("help.website", "ArtCraft Website", "ArtCraft 网站"),
-    ("help.appPage", "TokEffect Home Page", "TokEffect 主页"),
-    ("help.github", "TokEffect on GitHub", "GitHub 上的 TokEffect"),
+    ("help.appPage", "TokCraft Home Page", "TokCraft 主页"),
+    ("help.github", "TokCraft on GitHub", "GitHub 上的 TokCraft"),
     ("file.openDemoProject", "Open Demo Project", "打开示例项目"),
 ];
 
@@ -944,8 +944,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
 /// entry per fixed menu row of the engine's menu tree, mirroring `SIMPLIFIED_CHINESE` in the
 /// vocabulary the sibling Craft apps' zh-hant catalogs use.
 const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
-    ("", "TokEffect", "TokEffect"),
-    ("app.about", "About TokEffect...", "關於 TokEffect..."),
+    ("", "TokCraft", "TokCraft"),
+    ("app.about", "About TokCraft...", "關於 TokCraft..."),
     ("", "Settings...", "設定..."),
     ("app.settings", "General...", "一般..."),
     ("app.settings", "Startup & Repair...", "啟動和修復..."),
@@ -964,10 +964,10 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
     ("app.settings", "Video...", "視訊..."),
     ("app.settings", "3D...", "3D..."),
     ("app.settings", "Scripting & Expressions...", "指令碼和運算式..."),
-    ("app.hide", "Hide TokEffect", "隱藏 TokEffect"),
+    ("app.hide", "Hide TokCraft", "隱藏 TokCraft"),
     ("app.hideOthers", "Hide Others", "隱藏其他"),
     ("app.showAll", "Show All", "全部顯示"),
-    ("app.quit", "Quit TokEffect", "結束 TokEffect"),
+    ("app.quit", "Quit TokCraft", "結束 TokCraft"),
     ("", "File", "檔案"),
     ("", "New", "新增"),
     ("file.newProject", "New Project", "新增專案"),
@@ -990,7 +990,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
     ("file.import", "File...", "檔案..."),
     ("file.importMultiple", "Multiple Files...", "多個檔案..."),
     ("file.importTimeline", "Adobe Premiere Pro Project...", "Adobe Premiere Pro 專案..."),
-    ("file.importProject", "TokEffect Project...", "TokEffect 專案..."),
+    ("file.importProject", "TokCraft Project...", "TokCraft 專案..."),
     ("file.importPlaceholder", "Placeholder...", "預留位置..."),
     ("file.importSolid", "Solid...", "純色..."),
     ("file.importLottie", "Lottie...", "Lottie..."),
@@ -1555,7 +1555,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
     ("window.panel", "Create Nulls From Paths", "從路徑建立空物件"),
     ("window.panel", "VR Comp Editor", "VR 合成編輯器"),
     ("", "Help", "說明"),
-    ("help.docs", "TokEffect Help...", "TokEffect 說明..."),
+    ("help.docs", "TokCraft Help...", "TokCraft 說明..."),
     ("help.docs", "Scripting Help...", "指令碼說明..."),
     ("help.docs", "Expression Reference...", "運算式參考..."),
     ("help.docs", "Effect Reference...", "效果參考..."),
@@ -1569,14 +1569,14 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
     ("help.discord", "Join the ArtCraft Discord...", "加入 ArtCraft 的 Discord 社群..."),
     ("help.reportIssue", "Provide Feedback...", "提供意見..."),
     ("help.website", "ArtCraft Website", "ArtCraft 網站"),
-    ("help.appPage", "TokEffect Home Page", "TokEffect 首頁"),
-    ("help.github", "TokEffect on GitHub", "GitHub 上的 TokEffect"),
+    ("help.appPage", "TokCraft Home Page", "TokCraft 首頁"),
+    ("help.github", "TokCraft on GitHub", "GitHub 上的 TokCraft"),
     ("file.openDemoProject", "Open Demo Project", "開啟範例專案"),
 ];
 
 const JAPANESE: &[(&str, &str, &str)] = &[
-    ("", "TokEffect", "TokEffect"),
-    ("app.about", "About TokEffect...", "TokEffectについて..."),
+    ("", "TokCraft", "TokCraft"),
+    ("app.about", "About TokCraft...", "TokCraftについて..."),
     ("", "Settings...", "設定..."),
     ("app.settings", "General...", "一般..."),
     ("app.settings", "Startup & Repair...", "起動と修復..."),
@@ -1595,10 +1595,10 @@ const JAPANESE: &[(&str, &str, &str)] = &[
     ("app.settings", "Video...", "ビデオ..."),
     ("app.settings", "3D...", "3D..."),
     ("app.settings", "Scripting & Expressions...", "スクリプトとエクスプレッション..."),
-    ("app.hide", "Hide TokEffect", "TokEffectを隠す"),
+    ("app.hide", "Hide TokCraft", "TokCraftを隠す"),
     ("app.hideOthers", "Hide Others", "ほかを隠す"),
     ("app.showAll", "Show All", "すべてを表示"),
-    ("app.quit", "Quit TokEffect", "TokEffectを終了"),
+    ("app.quit", "Quit TokCraft", "TokCraftを終了"),
     ("", "File", "ファイル"),
     ("", "New", "新規"),
     ("file.newProject", "New Project", "新規プロジェクト"),
@@ -1624,7 +1624,7 @@ const JAPANESE: &[(&str, &str, &str)] = &[
     ("file.importPlaceholder", "Placeholder...", "プレースホルダー..."),
     ("file.importSolid", "Solid...", "平面..."),
     ("file.importLottie", "Lottie...", "Lottie..."),
-    ("file.importProject", "TokEffect Project...", "TokEffectプロジェクト..."),
+    ("file.importProject", "TokCraft Project...", "TokCraftプロジェクト..."),
     ("file.importVanishingPoint", "Vanishing Point (.vpe)...", "Vanishing Point (.vpe)..."),
     ("essential.importTemplate", "Essential Graphics Template...", "エッセンシャルグラフィックステンプレート..."),
     ("", "Import Recent Footage", "最近使用したフッテージを読み込み"),
@@ -2186,7 +2186,7 @@ const JAPANESE: &[(&str, &str, &str)] = &[
     ("window.panel", "Create Nulls From Paths", "パスからヌルを作成"),
     ("window.panel", "VR Comp Editor", "VRコンポジションエディター"),
     ("", "Help", "ヘルプ"),
-    ("help.docs", "TokEffect Help...", "TokEffectヘルプ..."),
+    ("help.docs", "TokCraft Help...", "TokCraftヘルプ..."),
     ("help.docs", "Scripting Help...", "スクリプトヘルプ..."),
     ("help.docs", "Expression Reference...", "エクスプレッションリファレンス..."),
     ("help.docs", "Effect Reference...", "エフェクトリファレンス..."),
@@ -2200,8 +2200,8 @@ const JAPANESE: &[(&str, &str, &str)] = &[
     ("help.discord", "Join the ArtCraft Discord...", "ArtCraft Discordに参加..."),
     ("help.reportIssue", "Provide Feedback...", "フィードバックを送信..."),
     ("help.website", "ArtCraft Website", "ArtCraftウェブサイト"),
-    ("help.appPage", "TokEffect Home Page", "TokEffectホームページ"),
-    ("help.github", "TokEffect on GitHub", "GitHubのTokEffect"),
+    ("help.appPage", "TokCraft Home Page", "TokCraftホームページ"),
+    ("help.github", "TokCraft on GitHub", "GitHubのTokCraft"),
     ("file.openDemoProject", "Open Demo Project", "デモプロジェクトを開く"),
 ];
 
@@ -2209,8 +2209,8 @@ const JAPANESE: &[(&str, &str, &str)] = &[
 /// Ukrainian motion-graphics vocabulary. Product names and technical identifiers stay verbatim.
 /// The (command, source) keys match the other catalogs; no proprietary localization was used.
 const UKRAINIAN: &[(&str, &str, &str)] = &[
-    ("", "TokEffect", "TokEffect"),
-    ("app.about", "About TokEffect...", "Про TokEffect..."),
+    ("", "TokCraft", "TokCraft"),
+    ("app.about", "About TokCraft...", "Про TokCraft..."),
     ("", "Settings...", "Налаштування..."),
     ("app.settings", "General...", "Загальні..."),
     ("app.settings", "Startup & Repair...", "Запуск і відновлення..."),
@@ -2229,10 +2229,10 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
     ("app.settings", "Video...", "Відео..."),
     ("app.settings", "3D...", "3D..."),
     ("app.settings", "Scripting & Expressions...", "Скрипти та вирази..."),
-    ("app.hide", "Hide TokEffect", "Приховати TokEffect"),
+    ("app.hide", "Hide TokCraft", "Приховати TokCraft"),
     ("app.hideOthers", "Hide Others", "Приховати решту"),
     ("app.showAll", "Show All", "Показати все"),
-    ("app.quit", "Quit TokEffect", "Вийти з TokEffect"),
+    ("app.quit", "Quit TokCraft", "Вийти з TokCraft"),
     ("", "File", "Файл"),
     ("", "New", "Створити"),
     ("file.newProject", "New Project", "Новий проєкт"),
@@ -2255,7 +2255,7 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
     ("file.import", "File...", "Файл..."),
     ("file.importMultiple", "Multiple Files...", "Кілька файлів..."),
     ("file.importTimeline", "Adobe Premiere Pro Project...", "Проєкт Adobe Premiere Pro..."),
-    ("file.importProject", "TokEffect Project...", "Проєкт TokEffect..."),
+    ("file.importProject", "TokCraft Project...", "Проєкт TokCraft..."),
     ("file.importPlaceholder", "Placeholder...", "Заповнювач..."),
     ("file.importSolid", "Solid...", "Суцільний колір..."),
     ("file.importLottie", "Lottie...", "Lottie..."),
@@ -2820,7 +2820,7 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
     ("window.panel", "Create Nulls From Paths", "Створення нульових об’єктів із контурів"),
     ("window.panel", "VR Comp Editor", "Редактор композицій VR"),
     ("", "Help", "Довідка"),
-    ("help.docs", "TokEffect Help...", "Довідка TokEffect..."),
+    ("help.docs", "TokCraft Help...", "Довідка TokCraft..."),
     ("help.docs", "Scripting Help...", "Довідка зі скриптів..."),
     ("help.docs", "Expression Reference...", "Довідник виразів..."),
     ("help.docs", "Effect Reference...", "Довідник ефектів..."),
@@ -2834,8 +2834,8 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
     ("help.discord", "Join the ArtCraft Discord...", "Приєднатися до Discord ArtCraft..."),
     ("help.reportIssue", "Provide Feedback...", "Надіслати відгук..."),
     ("help.website", "ArtCraft Website", "Вебсайт ArtCraft"),
-    ("help.appPage", "TokEffect Home Page", "Домашня сторінка TokEffect"),
-    ("help.github", "TokEffect on GitHub", "TokEffect на GitHub"),
+    ("help.appPage", "TokCraft Home Page", "Домашня сторінка TokCraft"),
+    ("help.github", "TokCraft on GitHub", "TokCraft на GitHub"),
     ("file.openDemoProject", "Open Demo Project", "Відкрити демонстраційний проєкт"),
 ];
 
@@ -2844,8 +2844,8 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
 /// Wording follows Adobe's Spanish After Effects documentation (helpx.adobe.com/es) where it
 /// names the feature, and macOS Spanish for the app menu.
 const SPANISH: &[(&str, &str, &str)] = &[
-    ("", "TokEffect", "TokEffect"),
-    ("app.about", "About TokEffect...", "Acerca de TokEffect..."),
+    ("", "TokCraft", "TokCraft"),
+    ("app.about", "About TokCraft...", "Acerca de TokCraft..."),
     ("", "Settings...", "Ajustes..."),
     ("app.settings", "General...", "General..."),
     ("app.settings", "Startup & Repair...", "Inicio y reparación..."),
@@ -2864,10 +2864,10 @@ const SPANISH: &[(&str, &str, &str)] = &[
     ("app.settings", "Video...", "Vídeo..."),
     ("app.settings", "3D...", "3D..."),
     ("app.settings", "Scripting & Expressions...", "Scripts y expresiones..."),
-    ("app.hide", "Hide TokEffect", "Ocultar TokEffect"),
+    ("app.hide", "Hide TokCraft", "Ocultar TokCraft"),
     ("app.hideOthers", "Hide Others", "Ocultar otros"),
     ("app.showAll", "Show All", "Mostrar todo"),
-    ("app.quit", "Quit TokEffect", "Salir de TokEffect"),
+    ("app.quit", "Quit TokCraft", "Salir de TokCraft"),
     ("", "File", "Archivo"),
     ("", "New", "Nuevo"),
     ("file.newProject", "New Project", "Nuevo proyecto"),
@@ -2890,7 +2890,7 @@ const SPANISH: &[(&str, &str, &str)] = &[
     ("file.import", "File...", "Archivo..."),
     ("file.importMultiple", "Multiple Files...", "Varios archivos..."),
     ("file.importTimeline", "Adobe Premiere Pro Project...", "Proyecto de Adobe Premiere Pro..."),
-    ("file.importProject", "TokEffect Project...", "Proyecto de TokEffect..."),
+    ("file.importProject", "TokCraft Project...", "Proyecto de TokCraft..."),
     ("file.importPlaceholder", "Placeholder...", "Marcador de posición..."),
     ("file.importSolid", "Solid...", "Sólido..."),
     ("file.importLottie", "Lottie...", "Lottie..."),
@@ -3455,7 +3455,7 @@ const SPANISH: &[(&str, &str, &str)] = &[
     ("window.panel", "Create Nulls From Paths", "Crear nulos a partir de trazados"),
     ("window.panel", "VR Comp Editor", "Editor de composición de RV"),
     ("", "Help", "Ayuda"),
-    ("help.docs", "TokEffect Help...", "Ayuda de TokEffect..."),
+    ("help.docs", "TokCraft Help...", "Ayuda de TokCraft..."),
     ("help.docs", "Scripting Help...", "Ayuda de scripts..."),
     ("help.docs", "Expression Reference...", "Referencia de expresiones..."),
     ("help.docs", "Effect Reference...", "Referencia de efectos..."),
@@ -3469,16 +3469,16 @@ const SPANISH: &[(&str, &str, &str)] = &[
     ("help.discord", "Join the ArtCraft Discord...", "Unirse al Discord de ArtCraft..."),
     ("help.reportIssue", "Provide Feedback...", "Enviar comentarios..."),
     ("help.website", "ArtCraft Website", "Sitio web de ArtCraft"),
-    ("help.appPage", "TokEffect Home Page", "Página de inicio de TokEffect"),
-    ("help.github", "TokEffect on GitHub", "TokEffect en GitHub"),
+    ("help.appPage", "TokCraft Home Page", "Página de inicio de TokCraft"),
+    ("help.github", "TokCraft on GitHub", "TokCraft en GitHub"),
     ("file.openDemoProject", "Open Demo Project", "Abrir proyecto de demostración"),
 ];
 
 /// Brazilian Portuguese: the same (command, English label) keys as `JAPANESE`, one entry
 /// per fixed menu row of the engine's menu tree.
 const PORTUGUESE: &[(&str, &str, &str)] = &[
-    ("", "TokEffect", "TokEffect"),
-    ("app.about", "About TokEffect...", "Sobre o TokEffect..."),
+    ("", "TokCraft", "TokCraft"),
+    ("app.about", "About TokCraft...", "Sobre o TokCraft..."),
     ("", "Settings...", "Configurações..."),
     ("app.settings", "General...", "Geral..."),
     ("app.settings", "Startup & Repair...", "Inicialização e reparo..."),
@@ -3497,10 +3497,10 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
     ("app.settings", "Video...", "Vídeo..."),
     ("app.settings", "3D...", "3D..."),
     ("app.settings", "Scripting & Expressions...", "Scripts e expressões..."),
-    ("app.hide", "Hide TokEffect", "Ocultar TokEffect"),
+    ("app.hide", "Hide TokCraft", "Ocultar TokCraft"),
     ("app.hideOthers", "Hide Others", "Ocultar outros"),
     ("app.showAll", "Show All", "Mostrar tudo"),
-    ("app.quit", "Quit TokEffect", "Sair do TokEffect"),
+    ("app.quit", "Quit TokCraft", "Sair do TokCraft"),
     ("", "File", "Arquivo"),
     ("", "New", "Novo"),
     ("file.newProject", "New Project", "Novo projeto"),
@@ -3523,7 +3523,7 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
     ("file.import", "File...", "Arquivo..."),
     ("file.importMultiple", "Multiple Files...", "Vários arquivos..."),
     ("file.importTimeline", "Adobe Premiere Pro Project...", "Projeto do Adobe Premiere Pro..."),
-    ("file.importProject", "TokEffect Project...", "Projeto do TokEffect..."),
+    ("file.importProject", "TokCraft Project...", "Projeto do TokCraft..."),
     ("file.importPlaceholder", "Placeholder...", "Espaço reservado..."),
     ("file.importSolid", "Solid...", "Sólido..."),
     ("file.importLottie", "Lottie...", "Lottie..."),
@@ -4088,7 +4088,7 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
     ("window.panel", "Create Nulls From Paths", "Criar nulls a partir de caminhos"),
     ("window.panel", "VR Comp Editor", "Editor de composição VR"),
     ("", "Help", "Ajuda"),
-    ("help.docs", "TokEffect Help...", "Ajuda do TokEffect..."),
+    ("help.docs", "TokCraft Help...", "Ajuda do TokCraft..."),
     ("help.docs", "Scripting Help...", "Ajuda de scripting..."),
     ("help.docs", "Expression Reference...", "Referência de expressões..."),
     ("help.docs", "Effect Reference...", "Referência de efeitos..."),
@@ -4102,8 +4102,8 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
     ("help.discord", "Join the ArtCraft Discord...", "Entrar no Discord do ArtCraft..."),
     ("help.reportIssue", "Provide Feedback...", "Enviar comentários..."),
     ("help.website", "ArtCraft Website", "Site do ArtCraft"),
-    ("help.appPage", "TokEffect Home Page", "Página inicial do TokEffect"),
-    ("help.github", "TokEffect on GitHub", "TokEffect no GitHub"),
+    ("help.appPage", "TokCraft Home Page", "Página inicial do TokCraft"),
+    ("help.github", "TokCraft on GitHub", "TokCraft no GitHub"),
     ("file.openDemoProject", "Open Demo Project", "Abrir projeto de demonstração"),
 ];
 
@@ -4118,8 +4118,8 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
     ("", "Side", "Боковая грань"),
     ("", "Back", "Задняя грань"),
     ("layer.addTextAnimator", "Color", "Цвет"),
-    ("", "TokEffect", "TokEffect"),
-    ("app.about", "About TokEffect...", "О TokEffect..."),
+    ("", "TokCraft", "TokCraft"),
+    ("app.about", "About TokCraft...", "О TokCraft..."),
     ("", "Settings...", "Настройки..."),
     ("app.settings", "General...", "Общие..."),
     ("app.settings", "Startup & Repair...", "Запуск и восстановление..."),
@@ -4138,10 +4138,10 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
     ("app.settings", "Video...", "Видео..."),
     ("app.settings", "3D...", "3D..."),
     ("app.settings", "Scripting & Expressions...", "Скрипты и выражения..."),
-    ("app.hide", "Hide TokEffect", "Скрыть TokEffect"),
+    ("app.hide", "Hide TokCraft", "Скрыть TokCraft"),
     ("app.hideOthers", "Hide Others", "Скрыть остальные"),
     ("app.showAll", "Show All", "Показать все"),
-    ("app.quit", "Quit TokEffect", "Выйти из TokEffect"),
+    ("app.quit", "Quit TokCraft", "Выйти из TokCraft"),
     ("", "File", "Файл"),
     ("", "New", "Создать"),
     ("file.newProject", "New Project", "Новый проект"),
@@ -4164,7 +4164,7 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
     ("file.import", "File...", "Файл..."),
     ("file.importMultiple", "Multiple Files...", "Несколько файлов..."),
     ("file.importTimeline", "Adobe Premiere Pro Project...", "Проект Adobe Premiere Pro..."),
-    ("file.importProject", "TokEffect Project...", "Проект TokEffect..."),
+    ("file.importProject", "TokCraft Project...", "Проект TokCraft..."),
     ("file.importPlaceholder", "Placeholder...", "Заполнитель..."),
     ("file.importSolid", "Solid...", "Сплошной цвет..."),
     ("file.importLottie", "Lottie...", "Lottie..."),
@@ -4723,7 +4723,7 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
     ("window.panel", "Create Nulls From Paths", "Создание нулевых объектов из контуров"),
     ("window.panel", "VR Comp Editor", "Редактор VR-композиций"),
     ("", "Help", "Справка"),
-    ("help.docs", "TokEffect Help...", "Справка TokEffect..."),
+    ("help.docs", "TokCraft Help...", "Справка TokCraft..."),
     ("help.docs", "Scripting Help...", "Справка по скриптам..."),
     ("help.docs", "Expression Reference...", "Справочник по выражениям..."),
     ("help.docs", "Effect Reference...", "Справочник по эффектам..."),
@@ -4737,8 +4737,8 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
     ("help.discord", "Join the ArtCraft Discord...", "Присоединяйтесь к Discord ArtCraft..."),
     ("help.reportIssue", "Provide Feedback...", "Оставить отзыв..."),
     ("help.website", "ArtCraft Website", "Сайт ArtCraft"),
-    ("help.appPage", "TokEffect Home Page", "Главная страница TokEffect"),
-    ("help.github", "TokEffect on GitHub", "TokEffect на GitHub"),
+    ("help.appPage", "TokCraft Home Page", "Главная страница TokCraft"),
+    ("help.github", "TokCraft on GitHub", "TokCraft на GitHub"),
     ("file.openDemoProject", "Open Demo Project", "Открыть демонстрационный проект"),
 ];
 
@@ -4751,8 +4751,8 @@ const FRENCH: &[(&str, &str, &str)] = &[
     ("", "Side", "Côté"),
     ("", "Back", "Arrière"),
     ("layer.addTextAnimator", "Color", "Couleur"),
-    ("", "TokEffect", "TokEffect"),
-    ("app.about", "About TokEffect...", "À propos de TokEffect..."),
+    ("", "TokCraft", "TokCraft"),
+    ("app.about", "About TokCraft...", "À propos de TokCraft..."),
     ("", "Settings...", "Préférences..."),
     ("app.settings", "General...", "Général..."),
     ("app.settings", "Startup & Repair...", "Démarrage et réparation..."),
@@ -4771,10 +4771,10 @@ const FRENCH: &[(&str, &str, &str)] = &[
     ("app.settings", "Video...", "Vidéo..."),
     ("app.settings", "3D...", "3D..."),
     ("app.settings", "Scripting & Expressions...", "Scripts et expressions..."),
-    ("app.hide", "Hide TokEffect", "Masquer TokEffect"),
+    ("app.hide", "Hide TokCraft", "Masquer TokCraft"),
     ("app.hideOthers", "Hide Others", "Masquer les autres"),
     ("app.showAll", "Show All", "Tout afficher"),
-    ("app.quit", "Quit TokEffect", "Quitter TokEffect"),
+    ("app.quit", "Quit TokCraft", "Quitter TokCraft"),
     ("", "File", "Fichier"),
     ("", "New", "Nouveau"),
     ("file.newProject", "New Project", "Nouveau projet"),
@@ -4797,7 +4797,7 @@ const FRENCH: &[(&str, &str, &str)] = &[
     ("file.import", "File...", "Fichier..."),
     ("file.importMultiple", "Multiple Files...", "Plusieurs fichiers..."),
     ("file.importTimeline", "Adobe Premiere Pro Project...", "Projet Adobe Premiere Pro..."),
-    ("file.importProject", "TokEffect Project...", "Projet TokEffect..."),
+    ("file.importProject", "TokCraft Project...", "Projet TokCraft..."),
     ("file.importPlaceholder", "Placeholder...", "Espace réservé..."),
     ("file.importSolid", "Solid...", "Solide..."),
     ("file.importLottie", "Lottie...", "Lottie..."),
@@ -5356,7 +5356,7 @@ const FRENCH: &[(&str, &str, &str)] = &[
     ("window.panel", "Create Nulls From Paths", "Créer des nuls à partir des tracés"),
     ("window.panel", "VR Comp Editor", "Éditeur de composition VR"),
     ("", "Help", "Aide"),
-    ("help.docs", "TokEffect Help...", "Aide TokEffect..."),
+    ("help.docs", "TokCraft Help...", "Aide TokCraft..."),
     ("help.docs", "Scripting Help...", "Aide sur les scripts..."),
     ("help.docs", "Expression Reference...", "Référence des expressions..."),
     ("help.docs", "Effect Reference...", "Référence des effets..."),
@@ -5370,8 +5370,8 @@ const FRENCH: &[(&str, &str, &str)] = &[
     ("help.discord", "Join the ArtCraft Discord...", "Rejoindre le Discord ArtCraft..."),
     ("help.reportIssue", "Provide Feedback...", "Envoyer des commentaires..."),
     ("help.website", "ArtCraft Website", "Site web ArtCraft"),
-    ("help.appPage", "TokEffect Home Page", "Page d’accueil TokEffect"),
-    ("help.github", "TokEffect on GitHub", "TokEffect sur GitHub"),
+    ("help.appPage", "TokCraft Home Page", "Page d’accueil TokCraft"),
+    ("help.github", "TokCraft on GitHub", "TokCraft sur GitHub"),
     ("file.openDemoProject", "Open Demo Project", "Ouvrir le projet de démonstration"),
 ];
 
@@ -5384,8 +5384,8 @@ const GERMAN: &[(&str, &str, &str)] = &[
     ("", "Side", "Seite"),
     ("", "Back", "Rückseite"),
     ("layer.addTextAnimator", "Color", "Farbe"),
-    ("", "TokEffect", "TokEffect"),
-    ("app.about", "About TokEffect...", "Über TokEffect..."),
+    ("", "TokCraft", "TokCraft"),
+    ("app.about", "About TokCraft...", "Über TokCraft..."),
     ("", "Settings...", "Voreinstellungen..."),
     ("app.settings", "General...", "Allgemein..."),
     ("app.settings", "Startup & Repair...", "Start und Reparatur..."),
@@ -5404,10 +5404,10 @@ const GERMAN: &[(&str, &str, &str)] = &[
     ("app.settings", "Video...", "Video..."),
     ("app.settings", "3D...", "3D..."),
     ("app.settings", "Scripting & Expressions...", "Skripting und Ausdrücke..."),
-    ("app.hide", "Hide TokEffect", "TokEffect ausblenden"),
+    ("app.hide", "Hide TokCraft", "TokCraft ausblenden"),
     ("app.hideOthers", "Hide Others", "Andere ausblenden"),
     ("app.showAll", "Show All", "Alle einblenden"),
-    ("app.quit", "Quit TokEffect", "TokEffect beenden"),
+    ("app.quit", "Quit TokCraft", "TokCraft beenden"),
     ("", "File", "Datei"),
     ("", "New", "Neu"),
     ("file.newProject", "New Project", "Neues Projekt"),
@@ -5430,7 +5430,7 @@ const GERMAN: &[(&str, &str, &str)] = &[
     ("file.import", "File...", "Datei..."),
     ("file.importMultiple", "Multiple Files...", "Mehrere Dateien..."),
     ("file.importTimeline", "Adobe Premiere Pro Project...", "Adobe Premiere Pro-Projekt..."),
-    ("file.importProject", "TokEffect Project...", "TokEffect-Projekt..."),
+    ("file.importProject", "TokCraft Project...", "TokCraft-Projekt..."),
     ("file.importPlaceholder", "Placeholder...", "Platzhalter..."),
     ("file.importSolid", "Solid...", "Farbfläche..."),
     ("file.importLottie", "Lottie...", "Lottie..."),
@@ -5989,7 +5989,7 @@ const GERMAN: &[(&str, &str, &str)] = &[
     ("window.panel", "Create Nulls From Paths", "Null-Objekte aus Pfaden erstellen"),
     ("window.panel", "VR Comp Editor", "VR-Kompositionseditor"),
     ("", "Help", "Hilfe"),
-    ("help.docs", "TokEffect Help...", "TokEffect-Hilfe..."),
+    ("help.docs", "TokCraft Help...", "TokCraft-Hilfe..."),
     ("help.docs", "Scripting Help...", "Hilfe zu Skripts..."),
     ("help.docs", "Expression Reference...", "Ausdrucksreferenz..."),
     ("help.docs", "Effect Reference...", "Effektreferenz..."),
@@ -6003,8 +6003,8 @@ const GERMAN: &[(&str, &str, &str)] = &[
     ("help.discord", "Join the ArtCraft Discord...", "ArtCraft-Discord beitreten..."),
     ("help.reportIssue", "Provide Feedback...", "Feedback senden..."),
     ("help.website", "ArtCraft Website", "ArtCraft-Website"),
-    ("help.appPage", "TokEffect Home Page", "TokEffect-Startseite"),
-    ("help.github", "TokEffect on GitHub", "TokEffect auf GitHub"),
+    ("help.appPage", "TokCraft Home Page", "TokCraft-Startseite"),
+    ("help.github", "TokCraft on GitHub", "TokCraft auf GitHub"),
     ("file.openDemoProject", "Open Demo Project", "Demoprojekt öffnen"),
 ];
 
@@ -6017,8 +6017,8 @@ const CZECH: &[(&str, &str, &str)] = &[
     ("", "Side", "Boční strana"),
     ("", "Back", "Zadní strana"),
     ("layer.addTextAnimator", "Color", "Barva"),
-    ("", "TokEffect", "TokEffect"),
-    ("app.about", "About TokEffect...", "O aplikaci TokEffect..."),
+    ("", "TokCraft", "TokCraft"),
+    ("app.about", "About TokCraft...", "O aplikaci TokCraft..."),
     ("", "Settings...", "Nastavení..."),
     ("app.settings", "General...", "Obecné..."),
     ("app.settings", "Startup & Repair...", "Spuštění a oprava..."),
@@ -6037,10 +6037,10 @@ const CZECH: &[(&str, &str, &str)] = &[
     ("app.settings", "Video...", "Video..."),
     ("app.settings", "3D...", "3D..."),
     ("app.settings", "Scripting & Expressions...", "Skripty a výrazy..."),
-    ("app.hide", "Hide TokEffect", "Skrýt TokEffect"),
+    ("app.hide", "Hide TokCraft", "Skrýt TokCraft"),
     ("app.hideOthers", "Hide Others", "Skrýt ostatní"),
     ("app.showAll", "Show All", "Zobrazit vše"),
-    ("app.quit", "Quit TokEffect", "Ukončit TokEffect"),
+    ("app.quit", "Quit TokCraft", "Ukončit TokCraft"),
     ("", "File", "Soubor"),
     ("", "New", "Nový"),
     ("file.newProject", "New Project", "Nový projekt"),
@@ -6063,7 +6063,7 @@ const CZECH: &[(&str, &str, &str)] = &[
     ("file.import", "File...", "Soubor..."),
     ("file.importMultiple", "Multiple Files...", "Více souborů..."),
     ("file.importTimeline", "Adobe Premiere Pro Project...", "Projekt Adobe Premiere Pro..."),
-    ("file.importProject", "TokEffect Project...", "Projekt TokEffect..."),
+    ("file.importProject", "TokCraft Project...", "Projekt TokCraft..."),
     ("file.importPlaceholder", "Placeholder...", "Zástupný záznam..."),
     ("file.importSolid", "Solid...", "Plná vrstva..."),
     ("file.importLottie", "Lottie...", "Lottie..."),
@@ -6623,7 +6623,7 @@ const CZECH: &[(&str, &str, &str)] = &[
     ("window.panel", "Create Nulls From Paths", "Vytvořit prázdné objekty z cest"),
     ("window.panel", "VR Comp Editor", "Editor kompozice VR"),
     ("", "Help", "Nápověda"),
-    ("help.docs", "TokEffect Help...", "Nápověda k TokEffect..."),
+    ("help.docs", "TokCraft Help...", "Nápověda k TokCraft..."),
     ("help.docs", "Scripting Help...", "Nápověda ke skriptování..."),
     ("help.docs", "Expression Reference...", "Referenční příručka výrazů..."),
     ("help.docs", "Effect Reference...", "Referenční příručka efektů..."),
@@ -6637,8 +6637,8 @@ const CZECH: &[(&str, &str, &str)] = &[
     ("help.discord", "Join the ArtCraft Discord...", "Připojit se na Discord ArtCraft..."),
     ("help.reportIssue", "Provide Feedback...", "Poskytnout zpětnou vazbu..."),
     ("help.website", "ArtCraft Website", "Web ArtCraft"),
-    ("help.appPage", "TokEffect Home Page", "Domovská stránka TokEffect"),
-    ("help.github", "TokEffect on GitHub", "TokEffect na GitHubu"),
+    ("help.appPage", "TokCraft Home Page", "Domovská stránka TokCraft"),
+    ("help.github", "TokCraft on GitHub", "TokCraft na GitHubu"),
     ("file.openDemoProject", "Open Demo Project", "Otevřít ukázkový projekt"),
 ];
 
@@ -6651,7 +6651,7 @@ mod tests {
 
     #[test]
     fn czech_translates_menus_without_changing_bindings_or_user_names() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key": "general.language", "value": "en"})).unwrap();
         app.session.prefs.push_recent("File.ecproj");
         let en = crate::native_menu::build(&app);
@@ -6699,7 +6699,7 @@ mod tests {
 
     #[test]
     fn czech_undo_redo_keeps_history_labels_verbatim() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key": "general.language", "value": "cs"})).unwrap();
         let undo = MenuEntry { label: "Undo".into(), command: "edit.undo".into(), params: json!({}), shortcut: None, alt_shortcuts: vec![] };
         let redo = MenuEntry { label: "Redo".into(), command: "edit.redo".into(), params: json!({}), shortcut: None, alt_shortcuts: vec![] };
@@ -6716,7 +6716,7 @@ mod tests {
         // As `czech_…` and `ukrainian_…` do. Asserted through `label`, not `entry`: `entry`
         // returns the English for German, Russian and French, which have catalogues but are
         // not wired into the menus (see the undo/redo match in `entry` and `supported`).
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key": "general.language", "value": "de"})).unwrap();
         for command in ["file.revealInFinder", "layer.revealInFinder"] {
             for (source, translated) in [
@@ -6734,7 +6734,7 @@ mod tests {
 
     #[test]
     fn german_menu_labels_name_what_their_command_does() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key": "general.language", "value": "de"})).unwrap();
         // "Ebenenreihenfolge umkehren" reads as reversing the stacking order, not time, and
         // "Formate" are formats, not layer styles (#1443).
@@ -6766,7 +6766,7 @@ mod tests {
 
     #[test]
     fn czech_reveal_labels_follow_the_platform_file_manager() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key": "general.language", "value": "cs"})).unwrap();
         for command in ["file.revealInFinder", "layer.revealInFinder"] {
             for (source, translated) in [
@@ -6861,7 +6861,7 @@ mod tests {
     /// Windows/Linux catalog miss, while filenames and unrelated commands stay untouched.
     #[test]
     fn ukrainian_reveal_labels_follow_the_platform_file_manager() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key": "general.language", "value": "uk"})).unwrap();
         for command in ["file.revealInFinder", "layer.revealInFinder"] {
             for (source, translated) in [
@@ -6884,7 +6884,7 @@ mod tests {
 
     #[test]
     fn language_changes_native_labels_without_changing_commands_or_parameters() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key":"general.language", "value":"en"})).unwrap();
         let en = crate::native_menu::build(&app);
         let state = crate::native_menu::state_key(&app);
@@ -6948,7 +6948,7 @@ mod tests {
         ] {
             assert_eq!(supported(locale), language, "{locale:?}");
         }
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         assert_eq!(app.session.prefs.general.language, "system", "the default");
         assert_eq!(japanese(&app), system_language() == "ja");
         assert_eq!(simplified(&app), system_language() == "zh-hans");
@@ -6988,7 +6988,7 @@ mod tests {
 
     #[test]
     fn zh_hans_translates_labels_computed_titles_and_keeps_names_verbatim() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key":"general.language", "value":"zh-hans"})).unwrap();
         assert_eq!(language(&app), "zh-hans");
         assert!(simplified(&app));
@@ -7032,7 +7032,7 @@ mod tests {
 
     #[test]
     fn zh_hant_translates_labels_computed_titles_and_keeps_names_verbatim() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key":"general.language", "value":"zh-hant"})).unwrap();
         assert_eq!(language(&app), "zh-hant");
         assert!(traditional(&app));
@@ -7076,7 +7076,7 @@ mod tests {
 
     #[test]
     fn ukrainian_translates_menus_without_changing_bindings_or_user_names() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key":"general.language", "value":"en"})).unwrap();
         app.session.prefs.push_recent("/tmp/File.ecproj");
         let en = crate::native_menu::build(&app);
@@ -7113,7 +7113,7 @@ mod tests {
 
     #[test]
     fn ukrainian_undo_redo_keeps_history_labels_verbatim() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key":"general.language", "value":"uk"})).unwrap();
         let undo = MenuEntry { label: "Undo".into(), command: "edit.undo".into(), params: json!({}), shortcut: None, alt_shortcuts: vec![] };
         let redo = MenuEntry { label: "Redo".into(), command: "edit.redo".into(), params: json!({}), shortcut: None, alt_shortcuts: vec![] };
@@ -7136,7 +7136,7 @@ mod tests {
 
     #[test]
     fn es_translates_labels_computed_titles_and_keeps_names_verbatim() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key":"general.language", "value":"es"})).unwrap();
         assert_eq!(language(&app), "es");
         assert!(spanish(&app));
@@ -7185,7 +7185,7 @@ mod tests {
 
     #[test]
     fn pt_br_translates_labels_computed_titles_and_keeps_names_verbatim() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.session.execute("prefs.set", json!({"key":"general.language", "value":"pt-br"})).unwrap();
         assert_eq!(language(&app), "pt-br");
         assert!(!japanese(&app));
@@ -7222,7 +7222,7 @@ mod tests {
 
     #[test]
     fn general_settings_exposes_the_language_automation_id() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         let ctx = egui::Context::default();
         let tokens = crate::theme::Tokens::for_kind(crate::theme::ThemeKind::Dark);
         crate::theme::install(&ctx, &tokens, language(&app));
