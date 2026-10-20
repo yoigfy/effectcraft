@@ -18,7 +18,7 @@ PrivilegesRequired=admin
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 OutputDir=..\..\dist
-OutputBaseFilename=TokEffect-Setup
+OutputBaseFilename=TokEffect
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -34,7 +34,7 @@ VersionInfoDescription=TokEffect video editor and motion graphics
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional shortcuts"; Flags: unchecked
 
 [Files]
-Source: "..\..\dist\TokEffect.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\dist\TokEffect-App.exe"; DestDir: "{app}"; DestName: "TokEffect.exe"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\TokEffect"; Filename: "{app}\TokEffect.exe"; WorkingDir: "{app}"
