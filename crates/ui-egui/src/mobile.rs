@@ -104,7 +104,7 @@ pub(crate) fn show_header(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rec
         menu.menu_button("Tools", |menu| {
             for slot in crate::state::Tool::SLOTS {
                 menu.menu_button(slot[0].label(), |menu| {
-                    for tool in slot {
+                    for tool in slot.iter() {
                         let row = menu.selectable_label(app.ui.tool == *tool, tool.label());
                         if row.clicked() {
                             app.ui.tool = *tool;
