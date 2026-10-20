@@ -42,7 +42,7 @@ jobs:
             throw 'The release executable was not produced.'
           }
           New-Item -ItemType Directory -Force -Path 'dist' | Out-Null
-          Copy-Item 'target/release/effectcraft.exe' 'dist/TokEffect.exe' -Force
+          Copy-Item 'target/release/effectcraft.exe' 'dist/TokEffect-App.exe' -Force
 
           # build.rs generates the TokEffect ICO directly from the project logo and embeds
           # it into the EXE. Reuse that exact ICO for the installer wizard too.
@@ -76,12 +76,10 @@ jobs:
           & $compiler "/DMyAppVersion=$version" 'packaging/windows/TokEffect.iss'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Upload TokEffect for Windows
+      - name: Upload single-file TokEffect installer
         uses: actions/upload-artifact@v7
         with:
           name: TokEffect-Windows
-          path: |
-            dist/TokEffect.exe
-            dist/TokEffect-Setup.exe
+          path: dist/TokEffect.exe
           if-no-files-found: error
           retention-days: 14
