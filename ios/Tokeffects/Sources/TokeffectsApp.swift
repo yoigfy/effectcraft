@@ -6,6 +6,7 @@ struct TokeffectsApp: App {
         WindowGroup {
             EditorHost()
                 .preferredColorScheme(.dark)
+                .ignoresSafeArea()
         }
     }
 }
