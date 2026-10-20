@@ -62,7 +62,7 @@ jobs:
           if (-not (Test-Path $compiler)) {
             throw 'Inno Setup compiler (ISCC.exe) is not available.'
           }
-          "$compiler" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          (Split-Path -Parent $compiler) | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
       - name: Build TokEffect installer
         shell: pwsh
