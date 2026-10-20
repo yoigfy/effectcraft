@@ -255,7 +255,7 @@ page!(Disk {
 });
 
 page!(Memory {
-    ram_reserved_gb: u32 = 3,
+    ram_reserved_gb: u32 = 6,
     /// Processed-layer cache budget (MB).
     layer_cache_mb: u32 = 512,
     /// Decoded footage frame cache budget (MB).
@@ -549,9 +549,6 @@ pub fn migrate(mut v: Value) -> Value {
     if version < 4 {
         let memory = obj.entry("memory".to_string()).or_insert_with(|| json!({}));
         if let Some(m) = memory.as_object_mut() {
-            if m.get("ramReservedGb").and_then(Value::as_u64) == Some(6) {
-                m.insert("ramReservedGb".into(), json!(3));
-            }
             if m.get("layerCacheMb").and_then(Value::as_u64) == Some(1024) {
                 m.insert("layerCacheMb".into(), json!(512));
             }
@@ -1572,7 +1569,7 @@ mod tokcraft_defaults_tests {
         assert!(p.previews.fast_previews);
         assert_eq!(p.previews.zoom_quality, "faster");
         assert!(!p.startup.show_home_on_launch);
-        assert_eq!(p.memory.ram_reserved_gb, 3);
+        assert_eq!(p.memory.ram_reserved_gb, 6);
         assert_eq!(p.memory.layer_cache_mb, 512);
         assert_eq!(p.memory.media_cache_mb, 512);
         assert_eq!(p.memory.preview_cache_mb, 768);
