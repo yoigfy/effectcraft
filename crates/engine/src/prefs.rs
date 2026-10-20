@@ -169,9 +169,9 @@ page!(Appearance {
     /// The single theme before appearance modes (`dark`, `darker` or `light`), kept for older
     /// settings files and automation: setting it picks its family's mode and theme. While the mode
     /// is Dark or Light it mirrors the theme in use.
-    theme: String = "dark".into(),
-    /// `auto` (follow the operating system), `dark` or `light`. New installs stay Dark.
-    appearance_mode: String = "dark".into(),
+    theme: String = "light".into(),
+    /// `auto` (follow the operating system), `dark` or `light`. New installs start Light.
+    appearance_mode: String = "light".into(),
     /// The theme used in dark appearance: `dark` or `darker`.
     dark_theme: String = "dark".into(),
     /// The theme used in light appearance: `light`.
@@ -185,7 +185,7 @@ page!(Appearance {
     use_label_color_for_handles: bool = true,
     use_label_color_for_tabs: bool = true,
     cycle_mask_colors: bool = true,
-    use_gradients: bool = false,
+    use_gradients: bool = true,
     /// macOS: draw the menu bar inside the window instead of the system menu bar.
     in_window_menu_bar_mac: bool = false,
 });
