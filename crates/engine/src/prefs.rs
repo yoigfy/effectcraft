@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value, json};
 
 /// Current settings layout version.
-pub const PREFS_VERSION: u32 = 2;
+pub const PREFS_VERSION: u32 = 3;
 /// Settings file name in the config store.
 pub const PREFS_FILE: &str = "prefs.json";
 
@@ -117,7 +117,7 @@ page!(General {
 });
 
 page!(Startup {
-    show_home_on_launch: bool = true,
+    show_home_on_launch: bool = false,
     show_home_on_open_project: bool = false,
     /// After a crash, offer to open the most recent auto-save.
     offer_crash_recovery: bool = true,
@@ -157,9 +157,9 @@ page!(Previews {
     adaptive_resolution_limit: String = "1/8".into(),
     show_internal_wireframes: bool = false,
     cache_frames_when_idle: bool = false,
-    fast_previews: bool = false,
+    fast_previews: bool = true,
     /// `faster` or `moreAccurate`.
-    zoom_quality: String = "moreAccurate".into(),
+    zoom_quality: String = "faster".into(),
     show_gpu_info: bool = false,
     /// The monitor's colour space for View ▸ Use Display Color Management: `srgb` or `p3`.
     display_profile: String = "srgb".into(),
@@ -169,9 +169,9 @@ page!(Appearance {
     /// The single theme before appearance modes (`dark`, `darker` or `light`), kept for older
     /// settings files and automation: setting it picks its family's mode and theme. While the mode
     /// is Dark or Light it mirrors the theme in use.
-    theme: String = "light".into(),
-    /// `auto` (follow the operating system), `dark` or `light`. New installs start Light.
-    appearance_mode: String = "light".into(),
+    theme: String = "dark".into(),
+    /// `auto` (follow the operating system), `dark` or `light`. New installs start Dark.
+    appearance_mode: String = "dark".into(),
     /// The theme used in dark appearance: `dark` or `darker`.
     dark_theme: String = "dark".into(),
     /// The theme used in light appearance: `light`.
@@ -185,7 +185,7 @@ page!(Appearance {
     use_label_color_for_handles: bool = true,
     use_label_color_for_tabs: bool = true,
     cycle_mask_colors: bool = true,
-    use_gradients: bool = true,
+    use_gradients: bool = false,
     /// macOS: draw the menu bar inside the window instead of the system menu bar.
     in_window_menu_bar_mac: bool = false,
 });
@@ -520,6 +520,30 @@ pub fn migrate(mut v: Value) -> Value {
         a.insert("appearanceMode".into(), json!(mode));
         a.insert(slot.into(), json!(theme));
     }
+    // Version 3 is TokEffect's fast, dark workspace. Apply it once to the settings from the
+    // previous build too, so an existing installation does not silently stay in Light mode or
+    // keep the slower preview defaults. Export resolution and quality are deliberately untouched.
+    if version < 3 {
+        let appearance = obj.entry("appearance".to_string()).or_insert_with(|| json!({}));
+        if let Some(a) = appearance.as_object_mut() {
+            a.insert("theme".into(), json!("dark"));
+            a.insert("appearanceMode".into(), json!("dark"));
+            a.insert("darkTheme".into(), json!("dark"));
+            a.insert("useGradients".into(), json!(false));
+        }
+
+        let previews = obj.entry("previews".to_string()).or_insert_with(|| json!({}));
+        if let Some(p) = previews.as_object_mut() {
+            p.insert("fastPreviews".into(), json!(true));
+            p.insert("zoomQuality".into(), json!("faster"));
+        }
+
+        let startup = obj.entry("startup".to_string()).or_insert_with(|| json!({}));
+        if let Some(s) = startup.as_object_mut() {
+            s.insert("showHomeOnLaunch".into(), json!(false));
+        }
+    }
+
     obj.insert("version".into(), json!(PREFS_VERSION));
     v
 }
@@ -1511,4 +1535,35 @@ pub fn pages_json() -> Value {
         })
         .collect();
     json!(pages)
+}
+
+
+#[cfg(test)]
+mod tokeffect_defaults_tests {
+    use super::*;
+
+    #[test]
+    fn new_preferences_use_the_fast_dark_workspace() {
+        let p = Prefs::default();
+        assert_eq!(p.appearance.appearance_mode, "dark");
+        assert_eq!(p.appearance.theme, "dark");
+        assert!(!p.appearance.use_gradients);
+        assert!(p.previews.fast_previews);
+        assert_eq!(p.previews.zoom_quality, "faster");
+        assert!(!p.startup.show_home_on_launch);
+    }
+
+    #[test]
+    fn version_two_preferences_migrate_to_tokeffect_defaults() {
+        let p = Prefs::from_json(
+            r#"{"version":2,"appearance":{"theme":"light","appearanceMode":"light","darkTheme":"dark","lightTheme":"light","useGradients":true},"previews":{"fastPreviews":false,"zoomQuality":"moreAccurate"},"startup":{"showHomeOnLaunch":true}}"#,
+        );
+        assert_eq!(p.version, 3);
+        assert_eq!(p.appearance.appearance_mode, "dark");
+        assert_eq!(p.appearance.theme, "dark");
+        assert!(!p.appearance.use_gradients);
+        assert!(p.previews.fast_previews);
+        assert_eq!(p.previews.zoom_quality, "faster");
+        assert!(!p.startup.show_home_on_launch);
+    }
 }
