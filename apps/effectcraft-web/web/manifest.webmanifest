@@ -1,13 +1,13 @@
 {
-  "name": "EffectCraft",
-  "short_name": "EffectCraft",
-  "description": "Motion graphics and visual effects compositor, in the browser",
+  "name": "Tokeffects",
+  "short_name": "Tokeffects",
+  "description": "Motion graphics and visual effects editor",
   "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#1b1c1f",
-  "theme_color": "#1b1c1f",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "categories": ["graphics", "photo", "productivity"],
   "icons": [
     { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" },

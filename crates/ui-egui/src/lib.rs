@@ -24,6 +24,7 @@ pub mod i18n;
 pub mod icons;
 pub mod menu_keys;
 pub mod menus;
+mod mobile;
 pub mod native_menu;
 pub mod panels;
 mod pointer_wrap;
@@ -1686,19 +1687,47 @@ impl EffectcraftApp {
             ui.disable();
         }
         ui.painter().rect_filled(full, 0.0, t.app_bg);
+        let mobile_layout = mobile::is_mobile(full);
+        let active_mobile_panel = mobile::active_panel(&ctx);
         let mut top = full.min.y;
-        if self.ui.show_menu_bar {
+        if self.ui.show_menu_bar && !mobile_layout {
             let mb = egui::Rect::from_min_size(full.min, egui::vec2(full.width(), 24.0));
             let mut child = ui.new_child(egui::UiBuilder::new().max_rect(mb));
             child.painter().rect_filled(mb, 0.0, t.header_bg);
             menus::menu_bar(self, &mut child);
             top = mb.max.y;
         }
-        let header_h = 40.0;
-        let header = egui::Rect::from_min_size(egui::pos2(full.min.x, top), egui::vec2(full.width(), header_h));
-        header::show(self, ui, header);
-        let body = egui::Rect::from_min_max(egui::pos2(full.min.x + 4.0, header.max.y + 2.0), egui::pos2(full.max.x - 4.0, full.max.y - 4.0));
-        self.dock_area(ui, body);
+        if mobile_layout {
+            // Phones and portrait tablets use one full-width panel at a time, with native-sized
+            // touch targets at the top and bottom. Swap the dock only for this frame: the saved
+            // desktop workspace stays intact when the same project is later opened on a computer.
+            let header_h = 48.0;
+            let header = egui::Rect::from_min_size(egui::pos2(full.min.x, top), egui::vec2(full.width(), header_h));
+            mobile::show_header(self, ui, header, active_mobile_panel);
+            let nav_h = 64.0_f32.min(full.height() * 0.18);
+            let nav = egui::Rect::from_min_max(
+                egui::pos2(full.min.x, full.max.y - nav_h),
+                full.max,
+            );
+            let body = egui::Rect::from_min_max(
+                egui::pos2(full.min.x + 2.0, header.max.y + 2.0),
+                egui::pos2(full.max.x - 2.0, nav.min.y - 2.0),
+            );
+            let old_dock = std::mem::replace(&mut self.ui.dock, dock::mobile_workspace(active_mobile_panel));
+            let old_floating = std::mem::take(&mut self.ui.floating);
+            let old_maximized = self.ui.maximized.take();
+            self.dock_area(ui, body);
+            self.ui.dock = old_dock;
+            self.ui.floating = old_floating;
+            self.ui.maximized = old_maximized;
+            mobile::show_navigation(self, ui, nav);
+        } else {
+            let header_h = 40.0;
+            let header = egui::Rect::from_min_size(egui::pos2(full.min.x, top), egui::vec2(full.width(), header_h));
+            header::show(self, ui, header);
+            let body = egui::Rect::from_min_max(egui::pos2(full.min.x + 4.0, header.max.y + 2.0), egui::pos2(full.max.x - 4.0, full.max.y - 4.0));
+            self.dock_area(ui, body);
+        }
         #[cfg(not(target_arch = "wasm32"))]
         prefs_live::dropped_files(self, ui, full);
         if !tab_had_widget_focus {

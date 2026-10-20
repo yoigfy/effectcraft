@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#1b1c1f">
-  <meta name="description" content="EffectCraft: motion graphics and visual effects in the browser">
-  <title>EffectCraft</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Tokeffects: motion graphics and visual effects">
+  <title>Tokeffects</title>
+  <link rel="icon" href="icon-256.png" type="image/png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="icon-256.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
   <style>
-    html, body { margin: 0; height: 100%; overflow: hidden; background: #1b1c1f; }
-    canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; overscroll-behavior: none; }
+    canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; -webkit-user-select: none; user-select: none; }
     #loading {
       position: absolute; inset: 0; display: flex; flex-direction: column; gap: 14px;
       align-items: center; justify-content: center; color: #c9c9cc;
@@ -23,7 +23,7 @@
     #device-lost {
       position: absolute; inset: 0; display: flex; flex-direction: column; gap: 10px;
       align-items: center; justify-content: center; padding: 16px; text-align: center;
-      background: rgb(18 18 18 / 0.85); color: #c8c8c8; font: 14px/1.4 system-ui, sans-serif;
+      background: rgb(0 0 0 / 0.92); color: #c8c8c8; font: 14px/1.4 system-ui, sans-serif;
     }
     #device-lost strong { color: #e3e3e3; font-size: 16px; }
     #device-lost p { margin: 0; max-width: 60ch; }
@@ -34,14 +34,14 @@
       background: #232323; color: #e3e3e3; font: inherit; cursor: pointer;
     }
     #device-lost button:hover { background: #303030; }
-    #device-lost button:last-child { background: #2d8ceb; border-color: #2d8ceb; }
-    #device-lost button:last-child:hover { background: #4aa0f5; }
+    #device-lost button:last-child { background: #383838; border-color: #555; }
+    #device-lost button:last-child:hover { background: #4a4a4a; }
     #device-lost button:disabled { opacity: 0.6; cursor: default; }
   </style>
 </head>
 <body>
   <canvas id="effectcraft_canvas"></canvas>
-  <div id="loading"><img src="favicon.svg" alt=""><div id="status">Loading EffectCraft…</div></div>
+  <div id="loading"><img src="favicon.svg" alt=""><div id="status">Loading Tokeffects…</div></div>
   <script type="module">
     import init, * as ec from "./effectcraft_web.js";
     const t0 = performance.now();
@@ -114,7 +114,7 @@
       window.effectcraftLoad.readyMs = performance.now() - t0;
     } catch (e) {
       const s = document.getElementById("status");
-      if (s) { s.className = "err"; s.textContent = "EffectCraft failed to start:\n" + (e && e.stack || e); }
+      if (s) { s.className = "err"; s.textContent = "Tokeffects failed to start:\n" + (e && e.stack || e); }
       window.effectcraftLoad.error = String(e);
       throw e;
     }

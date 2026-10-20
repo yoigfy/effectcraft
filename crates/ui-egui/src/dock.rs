@@ -297,6 +297,11 @@ pub const WORKSPACES: &[&str] = &[
     "Undocked Panels",
 ];
 
+/// A temporary single-panel dock used by the responsive phone/tablet shell. It is never saved.
+pub fn mobile_workspace(panel: PanelKind) -> DockNode {
+    DockNode::Tabs { panels: vec![panel], active: 0 }
+}
+
 /// The floating panels a workspace starts with (Undocked Panels), in points for a window of
 /// about 1680×1020 (they are kept inside the window when drawn).
 pub fn workspace_floating(name: &str) -> Vec<Floating> {
