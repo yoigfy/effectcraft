@@ -535,7 +535,7 @@ impl Desktop {
             let t = ui.input(|input| input.time);
             let offset = -36.0 + (t * 42.0).rem_euclid(72.0);
             let marker = egui::Rect::from_center_size(
-                egui::pos2(center.x + offset, bar.center().y),
+                egui::pos2(center.x + offset as f32, bar.center().y),
                 egui::vec2(20.0, 3.0),
             );
             painter.rect_filled(marker, 1.5, egui::Color32::from_gray(194));
