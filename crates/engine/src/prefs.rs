@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value, json};
 
 /// Current settings layout version.
-pub const PREFS_VERSION: u32 = 3;
+pub const PREFS_VERSION: u32 = 4;
 /// Settings file name in the config store.
 pub const PREFS_FILE: &str = "prefs.json";
 
@@ -93,7 +93,7 @@ macro_rules! page {
 }
 
 page!(General {
-    /// Interface language: `system` (the operating system's, where EffectCraft has it, else
+    /// Interface language: `system` (the operating system's, where TokCraft has it, else
     /// English), or a language code from `LANGUAGES`.
     language: String = "system".into(),
     /// Levels of Undo (1–99).
@@ -137,7 +137,7 @@ page!(AutoSave {
     enabled: bool = true,
     interval_minutes: u32 = 20,
     max_versions: u32 = 5,
-    /// `nextToProject` (an "EffectCraft Auto-Save" folder beside the project) or `custom`.
+    /// `nextToProject` (an "TokCraft Auto-Save" folder beside the project) or `custom`.
     location: String = "nextToProject".into(),
     folder: String = String::new(),
     save_on_render_start: bool = false,
@@ -255,13 +255,13 @@ page!(Disk {
 });
 
 page!(Memory {
-    ram_reserved_gb: u32 = 6,
+    ram_reserved_gb: u32 = 3,
     /// Processed-layer cache budget (MB).
-    layer_cache_mb: u32 = 1024,
+    layer_cache_mb: u32 = 512,
     /// Decoded footage frame cache budget (MB).
-    media_cache_mb: u32 = 1024,
+    media_cache_mb: u32 = 512,
     /// RAM preview (viewer frame) cache budget (MB).
-    preview_cache_mb: u32 = 3072,
+    preview_cache_mb: u32 = 768,
     reduce_cache_when_low: bool = true,
 });
 
@@ -520,7 +520,7 @@ pub fn migrate(mut v: Value) -> Value {
         a.insert("appearanceMode".into(), json!(mode));
         a.insert(slot.into(), json!(theme));
     }
-    // Version 3 is TokEffect's fast, dark workspace. Apply it once to the settings from the
+    // Version 3 is TokCraft's fast, dark workspace. Apply it once to the settings from the
     // previous build too, so an existing installation does not silently stay in Light mode or
     // keep the slower preview defaults. Export resolution and quality are deliberately untouched.
     if version < 3 {
@@ -541,6 +541,27 @@ pub fn migrate(mut v: Value) -> Value {
         let startup = obj.entry("startup".to_string()).or_insert_with(|| json!({}));
         if let Some(s) = startup.as_object_mut() {
             s.insert("showHomeOnLaunch".into(), json!(false));
+        }
+    }
+
+    // Version 4 uses smaller defaults on integrated graphics and low-memory computers.
+    // Preserve values people deliberately changed; only migrate the previous defaults.
+    if version < 4 {
+        let memory = obj.entry("memory".to_string()).or_insert_with(|| json!({}));
+        if let Some(m) = memory.as_object_mut() {
+            if m.get("ramReservedGb").and_then(Value::as_u64) == Some(6) {
+                m.insert("ramReservedGb".into(), json!(3));
+            }
+            if m.get("layerCacheMb").and_then(Value::as_u64) == Some(1024) {
+                m.insert("layerCacheMb".into(), json!(512));
+            }
+            if m.get("mediaCacheMb").and_then(Value::as_u64) == Some(1024) {
+                m.insert("mediaCacheMb".into(), json!(512));
+            }
+            if m.get("previewCacheMb").and_then(Value::as_u64) == Some(3072) {
+                m.insert("previewCacheMb".into(), json!(768));
+            }
+            m.entry("reduceCacheWhenLow".into()).or_insert(json!(true));
         }
     }
 
@@ -1203,7 +1224,7 @@ pub fn pages() -> Vec<Page> {
                 s("general.expressionPickWhipCompact", "Expression Pick Whip Writes Compact English", B, true),
                 s("general.createSplitLayersAbove", "Create Split Layers Above Original Layer", B, true),
                 s("general.useSystemColorPicker", "Use System Color Picker", B, false),
-                Note("EffectCraft always uses its own colour picker (the same on every platform and the web)."),
+                Note("TokCraft always uses its own colour picker (the same on every platform and the web)."),
             ],
         },
         Page {
@@ -1215,7 +1236,7 @@ pub fn pages() -> Vec<Page> {
                 s("startup.offerCrashRecovery", "Offer to Open the Latest Auto-Save After a Crash", B, true),
                 s("startup.windowGraphics", "Window Graphics", Kind::Choice(WINDOW_GRAPHICS), true),
                 Note(
-                    "Window Graphics applies from the next launch. When the graphics driver stops TokEffect as its window opens, the next launch switches to OpenGL.",
+                    "Window Graphics applies from the next launch. When the graphics driver stops TokCraft as its window opens, the next launch switches to OpenGL.",
                 ),
                 Section("Repair"),
                 Button { label: "Reset Settings", command: "prefs.reset", params: "{}" },
@@ -1539,7 +1560,7 @@ pub fn pages_json() -> Value {
 
 
 #[cfg(test)]
-mod tokeffect_defaults_tests {
+mod tokcraft_defaults_tests {
     use super::*;
 
     #[test]
@@ -1551,19 +1572,27 @@ mod tokeffect_defaults_tests {
         assert!(p.previews.fast_previews);
         assert_eq!(p.previews.zoom_quality, "faster");
         assert!(!p.startup.show_home_on_launch);
+        assert_eq!(p.memory.ram_reserved_gb, 3);
+        assert_eq!(p.memory.layer_cache_mb, 512);
+        assert_eq!(p.memory.media_cache_mb, 512);
+        assert_eq!(p.memory.preview_cache_mb, 768);
     }
 
     #[test]
-    fn version_two_preferences_migrate_to_tokeffect_defaults() {
+    fn version_two_preferences_migrate_to_tokcraft_defaults() {
         let p = Prefs::from_json(
             r#"{"version":2,"appearance":{"theme":"light","appearanceMode":"light","darkTheme":"dark","lightTheme":"light","useGradients":true},"previews":{"fastPreviews":false,"zoomQuality":"moreAccurate"},"startup":{"showHomeOnLaunch":true}}"#,
         );
-        assert_eq!(p.version, 3);
+        assert_eq!(p.version, 4);
         assert_eq!(p.appearance.appearance_mode, "dark");
         assert_eq!(p.appearance.theme, "dark");
         assert!(!p.appearance.use_gradients);
         assert!(p.previews.fast_previews);
         assert_eq!(p.previews.zoom_quality, "faster");
         assert!(!p.startup.show_home_on_launch);
+        assert_eq!(p.memory.ram_reserved_gb, 3);
+        assert_eq!(p.memory.layer_cache_mb, 512);
+        assert_eq!(p.memory.media_cache_mb, 512);
+        assert_eq!(p.memory.preview_cache_mb, 768);
     }
 }
