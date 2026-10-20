@@ -1,4 +1,4 @@
-//! TokCraft desktop app.
+//! Tokeffects desktop app.
 //!
 //! Usage: `effectcraft [--control <port>] [--demo|--empty|--home] [--] [project.ecproj | media files…]`
 //!
@@ -31,8 +31,8 @@ mod window;
 use effectcraft_ui_egui::EffectcraftApp;
 use serde_json::json;
 
-/// TokCraft's app icon for the window, taskbar and Dock.
-const ICON_PNG: &[u8] = include_bytes!("../../../assets/app-icon/tokcraft.png");
+/// Tokeffects's app icon for the window, taskbar and Dock.
+const ICON_PNG: &[u8] = include_bytes!("../../../assets/app-icon/tokeffects.png");
 
 fn app_icon() -> egui::IconData {
     let png: &[u8] = ICON_PNG;
@@ -141,21 +141,21 @@ fn main() -> eframe::Result {
     let Args { control_port, files, demo, home } = match parse_args(std::env::args().skip(1), std::env::var("TOKCRAFT_CONTROL_PORT")) {
         Ok(Some(args)) => args,
         Ok(None) => {
-            println!("TokCraft {}", env!("CARGO_PKG_VERSION"));
+            println!("Tokeffects {}", env!("CARGO_PKG_VERSION"));
             return Ok(());
         }
         // Before the session log, preferences and the window: nothing has started yet.
         Err(e) => {
-            eprintln!("TokCraft: {e}");
+            eprintln!("Tokeffects: {e}");
             std::process::exit(1);
         }
     };
-    // The session log lives in the settings folder (`Logs/tokcraft.log`, the previous two runs
+    // The session log lives in the settings folder (`Logs/tokeffects.log`, the previous two runs
     // kept): a launch from the Dock or a menu has no terminal. Opened after the arguments, so
     // `--version` leaves no file behind; records logged until now are written to it first.
     if let Some(dir) = effectcraft_host::config_dir() {
         match effectcraft_engine::logging::attach_session_log(&effectcraft_engine::logging::log_dir(Some(&dir))) {
-            Ok(path) => log::info!("TokCraft {}, log file {}", env!("CARGO_PKG_VERSION"), path.display()),
+            Ok(path) => log::info!("Tokeffects {}, log file {}", env!("CARGO_PKG_VERSION"), path.display()),
             Err(e) => log::warn!("no log file: {e}"),
         }
     }
@@ -171,7 +171,7 @@ fn main() -> eframe::Result {
     let notice = launch.notice.take();
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_title("TokCraft")
+            .with_title("Tokeffects")
             .with_inner_size(window::DEFAULT_SIZE)
             .with_min_inner_size(window::MIN_SIZE)
             .with_drag_and_drop(true)
@@ -186,7 +186,7 @@ fn main() -> eframe::Result {
     };
     // Start-up milestones go to stderr and the session log, so a window that never appears
     // shows how far start-up got (#234).
-    log::info!("TokCraft {}: opening the window", env!("CARGO_PKG_VERSION"));
+    log::info!("Tokeffects {}: opening the window", env!("CARGO_PKG_VERSION"));
     // Registered before the event loop starts, so it catches the Finder event that launched us as
     // well as later ones. Lives until the event loop returns; the app creator only borrows it.
     #[cfg(target_os = "macos")]
@@ -194,7 +194,7 @@ fn main() -> eframe::Result {
     #[cfg(target_os = "macos")]
     let apple_events = &apple_events;
     let result = eframe::run_native(
-        "TokCraft",
+        "Tokeffects",
         options,
         Box::new(move |cc| {
             match &cc.wgpu_render_state {
@@ -202,7 +202,7 @@ fn main() -> eframe::Result {
                 None => log::info!("graphics: no wgpu device"),
             }
             // This executable owns the shared device's handlers. Install them before
-            // TokCraft's compositor pipelines are built, without changing handlers from
+            // Tokeffects's compositor pipelines are built, without changing handlers from
             // inside Gpu::new. eframe has already constructed its presentation renderer here.
             let gpu_failures = effectcraft_ui_egui::gpu_failure::GpuFailureBridge::new(&cc.egui_ctx);
             if let Some(rs) = &cc.wgpu_render_state {
@@ -218,119 +218,64 @@ fn main() -> eframe::Result {
                     lost.report(&format!("GPU device lost ({reason:?}): {message}"), true);
                 });
             }
-            let mut session = effectcraft_host::session();
-            // Lazy open and non-blocking auto-save: footage is checked and auto-saves are
-            // written on background threads (M13.14).
-            session.check_footage_on_open = true;
-            session.autosave.background = true;
-            // Settings, shortcut presets and the crash-recovery sentinel live in the platform
-            // config directory. Agent-driven runs (`--control`) skip crash recovery.
-            if let Some(dir) = effectcraft_host::config_dir() {
-                // WebAssembly effect plug-ins in <config>/Plug-ins load before the menus are built.
-                let plugins = dir.join("Plug-ins");
-                if plugins.is_dir() {
-                    let _ = session.execute("effect.plugins.load", json!({"folder": plugins.to_string_lossy()}));
-                }
-                session.config = Some(std::sync::Arc::new(effectcraft_engine::config::DirConfig::new(dir)));
-            }
-            session.load_settings();
-            // Fit the window to its monitor, or put it back where it was (still hidden).
-            let saved_window = session.config.as_deref().and_then(window::load);
+            // Restore saved geometry before loading the project so the window can appear
+            // right away. The heavier session, plugins and media setup happens off the UI thread.
+            let saved_window = effectcraft_host::config_dir().and_then(|dir| {
+                let config = effectcraft_engine::config::DirConfig::new(dir);
+                window::load(&config)
+            });
             let opened = cc.winit_window().map(|w| window::restore(w, saved_window));
-            let recovery = if control_port.is_none() { session.begin_recovery() } else { None };
-            let project = files.iter().find(|f| is_project_file(f)).cloned();
-            if let Some(p) = project {
-                if let Err(e) = session.execute("file.open", json!({"path": p})) {
-                    log::warn!("{p}: {e}");
-                }
-            } else if demo {
-                let _ = session.execute("file.openDemoProject", json!({}));
-            }
-            let media: Vec<String> = files.iter().filter(|f| !is_project_file(f)).cloned().collect();
-            if !media.is_empty()
-                && let Err(e) = session.execute("file.import", json!({"paths": media}))
-            {
-                log::warn!("import: {e}");
-            }
-            let show_home = home.unwrap_or(session.prefs.startup.show_home_on_launch && files.is_empty() && control_port.is_none());
-            // The ScriptUI panels open when the app last quit open again (a failing one is
-            // reported in a toast and forgotten).
-            let _ = session.execute("window.restoreScriptPanels", json!({}));
-            let mut app = EffectcraftApp::new(session);
-            app.set_gpu_failure_bridge(gpu_failures);
-            app.ui.start_screen = show_home;
-            if let Some(n) = notice {
-                app.ui.status = n;
-            }
-            if let Some(r) = recovery {
-                app.offer_recovery(r);
-            }
-            #[cfg(target_os = "linux")]
-            if let Some(note) = wayland_drop_notice(std::env::var_os("WAYLAND_DISPLAY").as_deref(), std::env::var_os("WINIT_UNIX_BACKEND").as_deref())
-                && app.ui.status.is_empty()
-            {
-                app.ui.status = note.into();
-            }
-            app.hooks.pick_files = Some(Box::new(|exts: &[&str]| {
-                rfd::FileDialog::new().add_filter("Media", exts).pick_files().unwrap_or_default().into_iter().map(|p| p.to_string_lossy().to_string()).collect()
-            }));
-            app.hooks.pick_save = Some(Box::new(|name: &str| {
-                rfd::FileDialog::new().add_filter("TokCraft Project", &["ecproj"]).set_file_name(name).save_file().map(|p| p.to_string_lossy().to_string())
-            }));
-            // The window closes after a lost graphics device (#591); say why, unless an agent drives
-            // the app through the control channel.
-            if control_port.is_none() {
-                app.hooks.device_lost = Some(Box::new(|saved: Option<Result<String, String>>| {
-                    let saved = match saved {
-                        Some(Ok(path)) => format!("\n\nYour unsaved changes were saved to:\n{path}\n\nReopen TokCraft to recover them."),
-                        Some(Err(e)) => format!("\n\nYour unsaved changes could not be saved ({e})."),
-                        None => String::new(),
-                    };
-                    rfd::MessageDialog::new()
-                        .set_level(rfd::MessageLevel::Error)
-                        .set_title("TokCraft: graphics device lost")
-                        .set_description(format!("The graphics driver stopped responding, so TokCraft has to close.{saved}"))
-                        .show();
-                }));
-            }
-            app.hooks.pick_open_project = Some(Box::new(|| {
-                rfd::FileDialog::new().add_filter("TokCraft Project", &["ecproj", "ecprojx"]).pick_file().map(|p| p.to_string_lossy().to_string())
-            }));
-            app.hooks.system_theme = appearance::service();
-            app.hooks.audio_device = Some(Box::new(audio_out::open));
-            app.hooks.audio_devices = Some(Box::new(audio_out::devices));
-            app.hooks.pick_folder = Some(Box::new(|| rfd::FileDialog::new().pick_folder().map(|p| p.to_string_lossy().to_string())));
-            app.hooks.pick_save_file = Some(Box::new(|name: &str, ext: &str| {
-                // A default with a folder that exists opens the dialog there.
-                let path = std::path::Path::new(name);
-                // (No filter for a name without an extension, such as a folder to create.)
-                let mut d = if ext.is_empty() { rfd::FileDialog::new() } else { rfd::FileDialog::new().add_filter(ext, &[ext]) };
-                if let Some(dir) = path.parent().filter(|d| d.is_dir()) {
-                    d = d.set_directory(dir);
-                }
-                let file = path.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
-                d.set_file_name(file).save_file().map(|p| p.to_string_lossy().to_string())
-            }));
-            // The commands' file dialogs don't block the frame where the platform's backend
-            // would (#511, #1275); see [`install_file_dialogs`].
-            install_file_dialogs(&mut app, &cc.egui_ctx);
-            #[cfg(target_os = "macos")]
-            {
-                app.hooks.app_action = Some(Box::new(native_menu::app_action));
-                app.hooks.clipboard_text = Some(Box::new(native_menu::clipboard_text));
-            }
-            if let Some(port) = control_port {
-                disable_app_nap();
-                let rx = control_server::start(port, cc.egui_ctx.clone());
-                app = app.with_control(rx);
-            }
-            log::info!("app created; the window shows after its first frame");
+            let (startup_tx, startup_rx) = std::sync::mpsc::sync_channel(1);
+            std::thread::Builder::new()
+                .name("tokeffects-startup".into())
+                .spawn(move || {
+                    let mut session = effectcraft_host::session();
+                    session.check_footage_on_open = true;
+                    session.autosave.background = true;
+
+                    if let Some(dir) = effectcraft_host::config_dir() {
+                        let plugins = dir.join("Plug-ins");
+                        if plugins.is_dir() {
+                            let _ = session.execute("effect.plugins.load", json!({"folder": plugins.to_string_lossy()}));
+                        }
+                        session.config = Some(std::sync::Arc::new(effectcraft_engine::config::DirConfig::new(dir)));
+                    }
+                    session.load_settings();
+
+                    let show_home = home.unwrap_or(
+                        session.prefs.startup.show_home_on_launch && files.is_empty() && control_port.is_none(),
+                    );
+                    let project = files.iter().find(|f| is_project_file(f)).cloned();
+                    if let Some(p) = project {
+                        if let Err(e) = session.execute("file.open", json!({"path": p})) {
+                            log::warn!("{p}: {e}");
+                        }
+                    } else if demo {
+                        let _ = session.execute("file.openDemoProject", json!({}));
+                    }
+                    let media: Vec<String> = files.iter().filter(|f| !is_project_file(f)).cloned().collect();
+                    if !media.is_empty()
+                        && let Err(e) = session.execute("file.import", json!({"paths": media}))
+                    {
+                        log::warn!("import: {e}");
+                    }
+                    let _ = session.execute("window.restoreScriptPanels", json!({}));
+                    let _ = startup_tx.send(PreparedStartup { session, show_home });
+                })?;
+
+            log::info!("Tokeffects: showing splash while the workspace initializes");
             Ok(Box::new(Desktop {
                 #[cfg(target_os = "macos")]
                 menu: native_menu::NativeBar::new(&cc.egui_ctx),
                 #[cfg(target_os = "macos")]
                 apple_events: apple_events.connect(&cc.egui_ctx),
-                app,
+                app: None,
+                startup_rx: Some(startup_rx),
+                startup_error: None,
+                gpu_failures,
+                notice,
+                control_port,
+                logo: None,
                 window: window::Tracker::new(opened, saved_window, control_port.is_none()),
                 launch,
                 drawn: false,
@@ -366,7 +311,7 @@ fn wgpu_options(backends: Option<eframe::wgpu::Backends>) -> eframe::WgpuConfigu
         // `WGPU_VALIDATION_INDIRECT_CALL=1` turns the check back on.
         setup.instance_descriptor.flags = setup.instance_descriptor.flags.difference(eframe::wgpu::InstanceFlags::VALIDATION_INDIRECT_CALL).with_env();
         setup.device_descriptor = std::sync::Arc::new(|adapter| eframe::wgpu::DeviceDescriptor {
-            label: Some("TokCraft device"),
+            label: Some("Tokeffects device"),
             required_limits: device_limits(adapter.limits()),
             ..Default::default()
         });
@@ -386,53 +331,244 @@ fn device_limits(adapter: eframe::wgpu::Limits) -> eframe::wgpu::Limits {
 fn startup_failed(e: &eframe::Error, gl_next: bool) {
     let next = if gl_next { "The next launch will try OpenGL instead. " } else { "" };
     let message = format!(
-        "TokCraft couldn't start its window: {e}\n\n{next}Updating the graphics driver often helps. If it keeps happening, please report it at https://github.com/storytold/effectcraft/issues with this message."
+        "Tokeffects couldn't start its window: {e}\n\n{next}Updating the graphics driver often helps. If it keeps happening, please report it at https://github.com/storytold/effectcraft/issues with this message."
     );
     // Standard error and the session log; standard error alone when RUST_LOG turned errors off.
     if log::log_enabled!(log::Level::Error) {
         log::error!("{message}");
     } else {
-        eprintln!("TokCraft: {message}");
+        eprintln!("Tokeffects: {message}");
     }
     let _ = rfd::MessageDialog::new()
         .set_level(rfd::MessageLevel::Error)
-        .set_title("TokCraft")
+        .set_title("Tokeffects")
         .set_description(message)
         .set_buttons(rfd::MessageButtons::Ok)
         .show();
 }
 
-/// The desktop app: the egui app plus, on macOS, the system menu bar.
+/// Session setup is prepared in a worker so loading media or plugins does not block the splash.
+struct PreparedStartup {
+    session: effectcraft_engine::Session,
+    show_home: bool,
+}
+
+/// The shell is displayed as soon as the graphics context is ready, then swaps to the editor.
 struct Desktop {
-    app: EffectcraftApp,
+    app: Option<EffectcraftApp>,
     #[cfg(target_os = "macos")]
     menu: native_menu::NativeBar,
-    /// Documents opened from Finder, the Dock or `open` (macOS).
     #[cfg(target_os = "macos")]
     apple_events: apple_events::Opened,
-    /// The window's size and position, saved for the next launch.
+    startup_rx: Option<std::sync::mpsc::Receiver<PreparedStartup>>,
+    startup_error: Option<String>,
+    gpu_failures: effectcraft_ui_egui::gpu_failure::GpuFailureBridge,
+    notice: Option<String>,
+    control_port: Option<u16>,
+    logo: Option<egui::TextureHandle>,
     window: window::Tracker,
     launch: launch_guard::Launch,
-    /// The first frame was drawn (logged once).
     drawn: bool,
+}
+
+impl Desktop {
+    fn poll_startup(&mut self, ctx: &egui::Context) {
+        let received = match self.startup_rx.as_ref() {
+            Some(rx) => rx.try_recv(),
+            None => return,
+        };
+        match received {
+            Ok(prepared) => {
+                self.startup_rx = None;
+                self.finish_startup(prepared, ctx);
+            }
+            Err(std::sync::mpsc::TryRecvError::Empty) => {}
+            Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                self.startup_rx = None;
+                self.startup_error = Some("Workspace loading failed. Restart Tokeffects and check the session log.".into());
+                log::error!("Tokeffects startup worker stopped before it finished preparing the workspace");
+            }
+        }
+    }
+
+    fn finish_startup(&mut self, prepared: PreparedStartup, ctx: &egui::Context) {
+        let mut app = EffectcraftApp::new(prepared.session);
+        app.set_gpu_failure_bridge(self.gpu_failures.clone());
+        app.ui.start_screen = prepared.show_home;
+        if let Some(message) = self.notice.take() {
+            app.ui.status = message;
+        }
+
+        if self.control_port.is_none()
+            && let Some(recovery) = app.session.begin_recovery()
+        {
+            app.offer_recovery(recovery);
+        }
+        #[cfg(target_os = "linux")]
+        if let Some(note) = wayland_drop_notice(
+            std::env::var_os("WAYLAND_DISPLAY").as_deref(),
+            std::env::var_os("WINIT_UNIX_BACKEND").as_deref(),
+        ) && app.ui.status.is_empty()
+        {
+            app.ui.status = note.into();
+        }
+
+        app.hooks.pick_files = Some(Box::new(|exts: &[&str]| {
+            rfd::FileDialog::new()
+                .add_filter("Media", exts)
+                .pick_files()
+                .unwrap_or_default()
+                .into_iter()
+                .map(|p| p.to_string_lossy().to_string())
+                .collect()
+        }));
+        app.hooks.pick_save = Some(Box::new(|name: &str| {
+            rfd::FileDialog::new()
+                .add_filter("Tokeffects Project", &["ecproj"])
+                .set_file_name(name)
+                .save_file()
+                .map(|p| p.to_string_lossy().to_string())
+        }));
+        if self.control_port.is_none() {
+            app.hooks.device_lost = Some(Box::new(|saved: Option<Result<String, String>>| {
+                let saved = match saved {
+                    Some(Ok(path)) => format!("\n\nYour unsaved changes were saved to:\n{path}\n\nReopen Tokeffects to recover them."),
+                    Some(Err(error)) => format!("\n\nYour unsaved changes could not be saved ({error})."),
+                    None => String::new(),
+                };
+                rfd::MessageDialog::new()
+                    .set_level(rfd::MessageLevel::Error)
+                    .set_title("Tokeffects: graphics device lost")
+                    .set_description(format!("The graphics driver stopped responding, so Tokeffects has to close.{saved}"))
+                    .show();
+            }));
+        }
+        app.hooks.pick_open_project = Some(Box::new(|| {
+            rfd::FileDialog::new()
+                .add_filter("Tokeffects Project", &["ecproj", "ecprojx"])
+                .pick_file()
+                .map(|p| p.to_string_lossy().to_string())
+        }));
+        app.hooks.system_theme = appearance::service();
+        app.hooks.audio_device = Some(Box::new(audio_out::open));
+        app.hooks.audio_devices = Some(Box::new(audio_out::devices));
+        app.hooks.pick_folder = Some(Box::new(|| {
+            rfd::FileDialog::new().pick_folder().map(|p| p.to_string_lossy().to_string())
+        }));
+        app.hooks.pick_save_file = Some(Box::new(|name: &str, ext: &str| {
+            let path = std::path::Path::new(name);
+            let mut dialog = if ext.is_empty() {
+                rfd::FileDialog::new()
+            } else {
+                rfd::FileDialog::new().add_filter(ext, &[ext])
+            };
+            if let Some(dir) = path.parent().filter(|dir| dir.is_dir()) {
+                dialog = dialog.set_directory(dir);
+            }
+            let file = path.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
+            dialog.set_file_name(file).save_file().map(|p| p.to_string_lossy().to_string())
+        }));
+        install_file_dialogs(&mut app, ctx);
+        #[cfg(target_os = "macos")]
+        {
+            app.hooks.app_action = Some(Box::new(native_menu::app_action));
+            app.hooks.clipboard_text = Some(Box::new(native_menu::clipboard_text));
+        }
+        if let Some(port) = self.control_port {
+            disable_app_nap();
+            let rx = control_server::start(port, ctx.clone());
+            app = app.with_control(rx);
+        }
+        self.app = Some(app);
+        log::info!("Tokeffects workspace ready");
+    }
+
+    fn splash(&mut self, ui: &mut egui::Ui) {
+        let ctx = ui.ctx().clone();
+        if self.logo.is_none() {
+            match image::load_from_memory(ICON_PNG) {
+                Ok(image) => {
+                    let rgba = image.to_rgba8();
+                    let size = [rgba.width() as usize, rgba.height() as usize];
+                    let pixels = egui::ColorImage::from_rgba_unmultiplied(size, rgba.as_raw());
+                    self.logo = Some(ctx.load_texture("tokeffects-splash-logo", pixels, egui::TextureOptions::LINEAR));
+                }
+                Err(error) => log::error!("could not load Tokeffects splash image: {error}"),
+            }
+        }
+        let rect = ui.max_rect();
+        let painter = ui.painter();
+        painter.rect_filled(rect, 0.0, egui::Color32::BLACK);
+        let center = rect.center();
+        if let Some(logo) = self.logo.as_ref() {
+            let image_rect = egui::Rect::from_center_size(
+                egui::pos2(center.x, center.y - 48.0),
+                egui::vec2(92.0, 92.0),
+            );
+            painter.image(
+                logo.id(),
+                image_rect,
+                egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
+                egui::Color32::WHITE,
+            );
+        }
+        let (title, subtitle) = if let Some(message) = self.startup_error.as_deref() {
+            ("Unable to start Tokeffects", message)
+        } else {
+            ("Tokeffects", "Preparing your workspace")
+        };
+        painter.text(
+            egui::pos2(center.x, center.y + 22.0),
+            egui::Align2::CENTER_CENTER,
+            title,
+            egui::FontId::new(22.0, egui::FontFamily::Proportional),
+            egui::Color32::from_gray(232),
+        );
+        painter.text(
+            egui::pos2(center.x, center.y + 49.0),
+            egui::Align2::CENTER_CENTER,
+            subtitle,
+            egui::FontId::new(11.5, egui::FontFamily::Proportional),
+            egui::Color32::from_gray(136),
+        );
+        if self.startup_error.is_none() {
+            let bar = egui::Rect::from_center_size(egui::pos2(center.x, center.y + 75.0), egui::vec2(92.0, 3.0));
+            painter.rect_filled(bar, 1.5, egui::Color32::from_gray(38));
+            let t = ui.input(|input| input.time);
+            let offset = -36.0 + (t * 42.0).rem_euclid(72.0);
+            let marker = egui::Rect::from_center_size(
+                egui::pos2(center.x + offset, bar.center().y),
+                egui::vec2(20.0, 3.0),
+            );
+            painter.rect_filled(marker, 1.5, egui::Color32::from_gray(194));
+            ctx.request_repaint_after(std::time::Duration::from_millis(33));
+        }
+    }
 }
 
 impl eframe::App for Desktop {
     fn logic(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        #[cfg(target_os = "macos")]
-        self.menu.update(&mut self.app, ctx);
-        self.app.logic(ctx, frame);
+        if let Some(app) = self.app.as_mut() {
+            #[cfg(target_os = "macos")]
+            self.menu.update(app, ctx);
+            app.logic(ctx, frame);
+        } else {
+            ctx.request_repaint_after(std::time::Duration::from_millis(40));
+        }
     }
 
     fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
-        self.app.ui(ui, frame);
-        self.window.frame(ui.ctx(), self.app.session.config.as_deref());
-        if !self.drawn {
-            self.drawn = true;
-            log::info!("first frame drawn");
+        self.poll_startup(ui.ctx());
+        if let Some(app) = self.app.as_mut() {
+            app.ui(ui, frame);
+            self.window.frame(ui.ctx(), app.session.config.as_deref());
+            if !self.drawn {
+                self.drawn = true;
+                log::info!("first editor frame drawn");
+            }
+        } else {
+            self.splash(ui);
         }
-        // The launch guard's marker goes once the window has kept drawing for a few seconds: a
-        // driver may still crash as the window is shown and its surface re-created.
         if let Some(left) = self.launch.frame_drawn() {
             ui.ctx().request_repaint_after(left);
         }
@@ -440,14 +576,20 @@ impl eframe::App for Desktop {
 
     fn on_exit(&mut self) {
         self.launch.exited();
-        self.window.save(self.app.session.config.as_deref());
-        self.app.on_exit();
+        if let Some(app) = self.app.as_mut() {
+            self.window.save(app.session.config.as_deref());
+            app.on_exit();
+        }
     }
 
     fn raw_input_hook(&mut self, ctx: &egui::Context, raw_input: &mut egui::RawInput) {
+        let ready = self.app.as_ref().is_some_and(|app| app.is_ready());
         #[cfg(target_os = "macos")]
-        self.apple_events.feed(self.app.is_ready(), ctx, raw_input);
-        self.app.raw_input_hook(ctx, raw_input);
+        self.apple_events.feed(ready, ctx, raw_input);
+        if let Some(app) = self.app.as_mut() {
+            app.raw_input_hook(ctx, raw_input);
+        }
+        let _ = ready;
     }
 }
 
@@ -472,7 +614,7 @@ fn disable_app_nap() {
     {
         use objc2_foundation::{NSActivityOptions, NSProcessInfo, NSString};
         let info = NSProcessInfo::processInfo();
-        let reason = NSString::from_str("TokCraft control channel");
+        let reason = NSString::from_str("Tokeffects control channel");
         let opts = NSActivityOptions::UserInitiatedAllowingIdleSystemSleep | NSActivityOptions::LatencyCritical;
         // Leaked on purpose: the activity lasts for the life of the process.
         std::mem::forget(info.beginActivityWithOptions_reason(opts, &reason));
