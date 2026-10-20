@@ -1567,7 +1567,7 @@ pub fn pages_json() -> Value {
 
 
 #[cfg(test)]
-mod tokcraft_defaults_tests {
+mod tokeffects_defaults_tests {
     use super::*;
 
     #[test]
@@ -1586,7 +1586,7 @@ mod tokcraft_defaults_tests {
     }
 
     #[test]
-    fn version_two_preferences_migrate_to_tokcraft_defaults() {
+    fn version_two_preferences_migrate_to_tokeffects_defaults() {
         let p = Prefs::from_json(
             r#"{"version":2,"appearance":{"theme":"light","appearanceMode":"light","darkTheme":"dark","lightTheme":"light","useGradients":true},"previews":{"fastPreviews":false,"zoomQuality":"moreAccurate"},"startup":{"showHomeOnLaunch":true}}"#,
         );
@@ -1597,7 +1597,7 @@ mod tokcraft_defaults_tests {
         assert!(p.previews.fast_previews);
         assert_eq!(p.previews.zoom_quality, "faster");
         assert!(!p.startup.show_home_on_launch);
-        assert_eq!(p.memory.ram_reserved_gb, 3);
+        assert_eq!(p.memory.ram_reserved_gb, 6);
         assert_eq!(p.memory.layer_cache_mb, 512);
         assert_eq!(p.memory.media_cache_mb, 512);
         assert_eq!(p.memory.preview_cache_mb, 768);
