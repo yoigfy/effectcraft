@@ -558,7 +558,6 @@ pub fn migrate(mut v: Value) -> Value {
             if m.get("previewCacheMb").and_then(Value::as_u64) == Some(3072) {
                 m.insert("previewCacheMb".into(), json!(768));
             }
-            m.entry("reduceCacheWhenLow".into()).or_insert(json!(true));
         }
     }
 
