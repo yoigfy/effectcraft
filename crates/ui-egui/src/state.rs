@@ -699,7 +699,7 @@ impl Default for UiState {
             tool: Tool::Selection,
             script_console: Default::default(),
             slot_tools: Tool::SLOTS.iter().map(|s| s[0]).collect(),
-            workspace: "TokCraft".into()
+            workspace: "TokCraft".into(),
             dock: crate::dock::workspace("TokCraft"),
             saved_workspaces: Default::default(),
             floating: vec![],
