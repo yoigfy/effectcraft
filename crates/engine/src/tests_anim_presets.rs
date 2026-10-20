@@ -78,7 +78,7 @@ fn transition_preset_by_name_and_bad_input() {
 #[test]
 fn preset_catalogue_is_unique_and_categorised() {
     let all = crate::animation_presets();
-    let known = ["Transitions", "Backgrounds"];
+    let known = ["Transitions", "Backgrounds", "Motion"];
     let mut ids = std::collections::HashSet::new();
     let mut names = std::collections::HashSet::new();
     for (id, name, cat) in &all {
@@ -90,7 +90,30 @@ fn preset_catalogue_is_unique_and_categorised() {
         assert!(!ids.contains(&id.to_lowercase()) && !names.contains(&name.to_lowercase()), "text preset {id} clashes");
     }
     let n = |c: &str| all.iter().filter(|(_, _, k)| k == c).count();
-    assert!(n("Backgrounds") >= 15 && n("Transitions") >= 20);
+    assert!(n("Backgrounds") >= 15 && n("Transitions") >= 20 && n("Motion") >= 10);
+}
+
+#[test]
+fn every_motion_preset_applies_and_undoes() {
+    let (mut s, solid) = session();
+    let list = s.execute("anim.builtinPresets", json!({"category": "Motion"})).unwrap();
+    let list = list.as_array().unwrap().clone();
+    assert!(list.len() >= 10, "{}", list.len());
+    for p in &list {
+        let id = p["id"].as_str().unwrap();
+        let r = s.execute("anim.applyBuiltinPreset", json!({"layers": [solid], "preset": id})).unwrap();
+        assert_eq!(r["skipped"], json!([]), "{id}: all motion paths and effect parameters must exist");
+        let layer = &s.active_comp().unwrap().layers[0];
+        let has_keys = layer.props.prop("transform/scale").is_some_and(|p| !p.keys.is_empty())
+            || layer.props.prop("transform/position").is_some_and(|p| !p.keys.is_empty())
+            || layer.props.prop("transform/rotation").is_some_and(|p| !p.keys.is_empty())
+            || layer.props.prop("transform/opacity").is_some_and(|p| !p.keys.is_empty())
+            || layer.effects().is_some_and(|fx| fx.groups().any(|g| g.prop("brightness").is_some_and(|p| !p.keys.is_empty())));
+        assert!(has_keys, "{id}: the preset should animate at least one property");
+        s.execute("edit.undo", json!({})).unwrap();
+        let layer = &s.active_comp().unwrap().layers[0];
+        assert_eq!(layer.effects().map_or(0, |fx| fx.groups().count()), 0, "{id}: undo removes added effects");
+    }
 }
 
 #[test]
