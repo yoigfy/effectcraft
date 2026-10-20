@@ -1182,7 +1182,7 @@ impl EffectcraftApp {
         // viewer): those frames would be stale at the next step and would hold the CPU and GPU
         // the next viewer frame needs.
         let ahead = if self.playback.playing {
-            (self.frames_parallelism() * 2).max(4) as i64
+            (self.frames_parallelism() * 2).clamp(2, 8) as i64
         } else if self.frames.urgent_pending() {
             0
         } else if let Some(wait) = self.editing(now) {

@@ -3,6 +3,8 @@ name: Build Tokeffects for Windows
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -30,6 +32,9 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
+
+      - name: Test native motion presets and undo safety
+        run: cargo test --locked -p effectcraft-engine --lib every_motion_preset_applies_and_undoes
 
       - name: Build optimized Tokeffects executable
         run: cargo build --release --locked -p tokeffects

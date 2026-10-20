@@ -1,6 +1,6 @@
 //! Design tokens. Every widget reads colours/sizes from [`Tokens`] so themes apply everywhere.
 //!
-//! Tokeffects uses a monochrome black-and-graphite interface with no colored UI accents.
+//! Tokeffects uses a strict black, charcoal and grayscale interface with no colored accents.
 //! Fonts are Inter + JetBrains Mono (OFL).
 
 use std::sync::Arc;
@@ -130,30 +130,30 @@ impl Tokens {
     pub fn for_kind(kind: ThemeKind) -> Self {
         let dark = Tokens {
             kind,
-            app_bg: Color32::from_rgb(0x00, 0x00, 0x00),
-            header_bg: Color32::from_rgb(0x12, 0x12, 0x12),
-            panel_bg: Color32::from_rgb(0x1c, 0x1c, 0x1c),
-            tab_text: Color32::from_gray(154),
+            app_bg: Color32::from_gray(0),
+            header_bg: Color32::from_gray(13),
+            panel_bg: Color32::from_gray(18),
+            tab_text: Color32::from_gray(160),
             tab_text_active: Color32::from_gray(245),
-            focus: Color32::from_gray(184),
-            accent: Color32::from_gray(188),
+            focus: Color32::from_gray(212),
+            accent: Color32::from_gray(200),
             accent_hover: Color32::from_gray(220),
             text: Color32::from_gray(232),
             text_dim: Color32::from_gray(174),
             text_faint: Color32::from_gray(122),
             icon: Color32::from_gray(188),
-            icon_active: Color32::from_rgb(0xff, 0xff, 0xff),
-            hover: Color32::from_gray(48),
-            pressed: Color32::from_gray(66),
-            field_bg: Color32::from_gray(8),
-            field_border: Color32::from_gray(68),
-            separator: Color32::from_gray(39),
-            row: Color32::from_gray(22),
-            row_alt: Color32::from_gray(30),
-            row_selected: Color32::from_gray(66),
+            icon_active: Color32::from_gray(255),
+            hover: Color32::from_gray(37),
+            pressed: Color32::from_gray(48),
+            field_bg: Color32::from_gray(10),
+            field_border: Color32::from_gray(49),
+            separator: Color32::from_gray(33),
+            row: Color32::from_gray(15),
+            row_alt: Color32::from_gray(20),
+            row_selected: Color32::from_gray(48),
             hot_text: Color32::from_gray(220),
-            tl_bg: Color32::from_gray(8),
-            tl_ruler_bg: Color32::from_gray(24),
+            tl_bg: Color32::from_gray(10),
+            tl_ruler_bg: Color32::from_gray(22),
             tl_ruler_tick: Color32::from_gray(125),
             tl_ruler_text: Color32::from_gray(182),
             cti: Color32::from_gray(238),
@@ -166,13 +166,13 @@ impl Tokens {
             timecode: Color32::from_gray(232),
             danger: Color32::from_gray(204),
             warning: Color32::from_gray(154),
-            fx_header: Color32::from_gray(34),
-            fx_header_active: Color32::from_gray(64),
-            tl_graph_selected: Color32::from_gray(54),
-            switch_well: Color32::from_gray(17),
+            fx_header: Color32::from_gray(24),
+            fx_header_active: Color32::from_gray(42),
+            tl_graph_selected: Color32::from_gray(39),
+            switch_well: Color32::from_gray(13),
             tl_nav_bar: Color32::from_gray(88),
             tl_work_area_bar: Color32::from_gray(122),
-            expr_bg: Color32::from_gray(8),
+            expr_bg: Color32::from_gray(10),
             expr_text: Color32::from_gray(222),
             labels: default_labels(),
             radius: 8.0,
@@ -185,15 +185,15 @@ impl Tokens {
         match kind {
             ThemeKind::Dark => dark,
             ThemeKind::Darker => Tokens {
-                app_bg: Color32::from_rgb(0x08, 0x08, 0x08),
-                header_bg: Color32::from_rgb(0x16, 0x16, 0x16),
-                panel_bg: Color32::from_rgb(0x19, 0x19, 0x19),
-                row: Color32::from_rgb(0x19, 0x19, 0x19),
-                row_alt: Color32::from_rgb(0x1d, 0x1d, 0x1d),
-                tl_bg: Color32::from_rgb(0x12, 0x12, 0x12),
-                tl_ruler_bg: Color32::from_rgb(0x19, 0x19, 0x19),
-                field_bg: Color32::from_rgb(0x0e, 0x0e, 0x0e),
-                pasteboard: Color32::from_rgb(0x11, 0x11, 0x11),
+                app_bg: Color32::from_gray(8),
+                header_bg: Color32::from_gray(22),
+                panel_bg: Color32::from_gray(25),
+                row: Color32::from_gray(25),
+                row_alt: Color32::from_gray(29),
+                tl_bg: Color32::from_gray(18),
+                tl_ruler_bg: Color32::from_gray(25),
+                field_bg: Color32::from_gray(14),
+                pasteboard: Color32::from_gray(17),
                 ..dark
             },
             ThemeKind::Light => Tokens {
@@ -273,8 +273,8 @@ impl Tokens {
         t
     }
 
-    /// Lighten (b > 0) or darken (b < 0) the interface greys. The entire UI palette is monochrome;
-    /// saved label colours are converted to greyscale when the theme tokens are built.
+    /// Lighten (b > 0) or darken (b < 0) the interface surfaces. Saved label colours are converted
+    /// to greyscale when the theme tokens are built.
     pub fn with_brightness(mut self, b: f32) -> Tokens {
         let b = b.clamp(-1.0, 1.0);
         if b.abs() < 1e-3 {
@@ -669,8 +669,8 @@ mod tests {
         for kind in [ThemeKind::Dark, ThemeKind::Darker, ThemeKind::Light] {
             let t = Tokens::for_kind(kind);
             for color in [
-                t.app_bg, t.header_bg, t.panel_bg, t.tab_text, t.tab_text_active, t.focus,
-                t.accent, t.accent_hover, t.text, t.text_dim, t.text_faint, t.icon,
+                t.app_bg, t.header_bg, t.panel_bg, t.tab_text, t.tab_text_active,
+                t.text, t.text_dim, t.text_faint, t.icon,
                 t.icon_active, t.hover, t.pressed, t.field_bg, t.field_border, t.separator,
                 t.row, t.row_alt, t.row_selected, t.hot_text, t.tl_bg, t.tl_ruler_bg,
                 t.tl_ruler_tick, t.tl_ruler_text, t.cti, t.work_area, t.cache_green,
