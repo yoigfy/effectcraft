@@ -1,6 +1,6 @@
 [package]
 name = "effectcraft"
-description = "EffectCraft desktop app"
+description = "TokEffect video editor and motion graphics app"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -32,8 +32,9 @@ log = { workspace = true }
 zbus = "5.19"
 
 [build-dependencies]
-# Icon + VERSIONINFO for effectcraft.exe; build.rs only uses it when targeting Windows.
+# Create a Windows ICO from the project-owned TokEffect PNG, and embed Windows VERSIONINFO.
 winresource = "0.1"
+image = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # Keep the control channel responsive when the window is covered (App Nap / occlusion throttling).
