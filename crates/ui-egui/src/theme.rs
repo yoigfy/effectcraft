@@ -1,6 +1,6 @@
 //! Design tokens. Every widget reads colours/sizes from [`Tokens`] so themes apply everywhere.
 //!
-//! Tokeffects uses a monochrome black-and-graphite interface with no colored UI accents.
+//! Tokeffects uses a black-and-graphite interface with a restrained cool accent.
 //! Fonts are Inter + JetBrains Mono (OFL).
 
 use std::sync::Arc;
@@ -136,7 +136,7 @@ impl Tokens {
             tab_text: Color32::from_gray(160),
             tab_text_active: Color32::from_gray(245),
             focus: Color32::from_rgb(0xb7, 0xc5, 0xff),
-            accent: Color32::from_rgb(0xaab8f5),
+            accent: Color32::from_rgb(0xaa, 0xb8, 0xf5),
             accent_hover: Color32::from_rgb(0xc5, 0xd0, 0xff),
             text: Color32::from_gray(232),
             text_dim: Color32::from_gray(174),
@@ -273,8 +273,8 @@ impl Tokens {
         t
     }
 
-    /// Lighten (b > 0) or darken (b < 0) the interface greys. The entire UI palette is monochrome;
-    /// saved label colours are converted to greyscale when the theme tokens are built.
+    /// Lighten (b > 0) or darken (b < 0) the interface surfaces. Saved label colours are converted
+    /// to greyscale when the theme tokens are built.
     pub fn with_brightness(mut self, b: f32) -> Tokens {
         let b = b.clamp(-1.0, 1.0);
         if b.abs() < 1e-3 {
@@ -669,8 +669,8 @@ mod tests {
         for kind in [ThemeKind::Dark, ThemeKind::Darker, ThemeKind::Light] {
             let t = Tokens::for_kind(kind);
             for color in [
-                t.app_bg, t.header_bg, t.panel_bg, t.tab_text, t.tab_text_active, t.focus,
-                t.accent, t.accent_hover, t.text, t.text_dim, t.text_faint, t.icon,
+                t.app_bg, t.header_bg, t.panel_bg, t.tab_text, t.tab_text_active,
+                t.text, t.text_dim, t.text_faint, t.icon,
                 t.icon_active, t.hover, t.pressed, t.field_bg, t.field_border, t.separator,
                 t.row, t.row_alt, t.row_selected, t.hot_text, t.tl_bg, t.tl_ruler_bg,
                 t.tl_ruler_tick, t.tl_ruler_text, t.cti, t.work_area, t.cache_green,
