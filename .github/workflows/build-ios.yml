@@ -66,6 +66,9 @@ jobs:
           set -euo pipefail
           test -s target/web/dist/index.html
           test -s target/web/dist/effectcraft_web_bg.wasm
+          # The base web builder has its own default branding. Replace its PWA/loading icons too.
+          sips -s format png -z 256 256 assets/app-icon/tokeffects.png --out target/web/dist/icon-256.png >/dev/null
+          sips -s format png -z 512 512 assets/app-icon/tokeffects.png --out target/web/dist/icon-512.png >/dev/null
           rm -rf ios/Tokeffects/Resources/web
           mkdir -p ios/Tokeffects/Resources/web ios/Tokeffects/Assets.xcassets/AppIcon.appiconset
           cp -R target/web/dist/. ios/Tokeffects/Resources/web/
