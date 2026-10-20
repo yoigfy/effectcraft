@@ -1,6 +1,6 @@
 //! Design tokens. Every widget reads colours/sizes from [`Tokens`] so themes apply everywhere.
 //!
-//! TokCraft's dark-first workspace uses restrained graphite surfaces, clear contrast, and a blue accent.
+//! Tokeffects uses a monochrome black-and-graphite interface with no colored UI accents.
 //! Fonts are Inter + JetBrains Mono (OFL).
 
 use std::sync::Arc;
@@ -130,50 +130,50 @@ impl Tokens {
     pub fn for_kind(kind: ThemeKind) -> Self {
         let dark = Tokens {
             kind,
-            app_bg: Color32::from_rgb(0x0f, 0x11, 0x16),
-            header_bg: Color32::from_rgb(0x15, 0x18, 0x20),
-            panel_bg: Color32::from_rgb(0x1b, 0x1f, 0x27),
-            tab_text: Color32::from_rgb(0x99, 0xa4, 0xb5),
-            tab_text_active: Color32::from_rgb(0xf4, 0xf6, 0xfa),
-            focus: Color32::from_rgb(0x78, 0xad, 0xff),
-            accent: Color32::from_rgb(0x57, 0x96, 0xff),
-            accent_hover: Color32::from_rgb(0x75, 0xad, 0xff),
-            text: Color32::from_rgb(0xe8, 0xec, 0xf2),
-            text_dim: Color32::from_rgb(0xb0, 0xb8, 0xc5),
-            text_faint: Color32::from_rgb(0x84, 0x90, 0xa1),
-            icon: Color32::from_rgb(0xb7, 0xc0, 0xcd),
+            app_bg: Color32::from_rgb(0x00, 0x00, 0x00),
+            header_bg: Color32::from_rgb(0x12, 0x12, 0x12),
+            panel_bg: Color32::from_rgb(0x1c, 0x1c, 0x1c),
+            tab_text: Color32::from_gray(154),
+            tab_text_active: Color32::from_gray(245),
+            focus: Color32::from_gray(184),
+            accent: Color32::from_gray(188),
+            accent_hover: Color32::from_gray(220),
+            text: Color32::from_gray(232),
+            text_dim: Color32::from_gray(174),
+            text_faint: Color32::from_gray(122),
+            icon: Color32::from_gray(188),
             icon_active: Color32::from_rgb(0xff, 0xff, 0xff),
-            hover: Color32::from_rgb(0x27, 0x2d, 0x37),
-            pressed: Color32::from_rgb(0x32, 0x3b, 0x49),
-            field_bg: Color32::from_rgb(0x13, 0x16, 0x1d),
-            field_border: Color32::from_rgb(0x2d, 0x34, 0x40),
-            separator: Color32::from_rgb(0x27, 0x2d, 0x37),
-            row: Color32::from_rgb(0x1d, 0x21, 0x29),
-            row_alt: Color32::from_rgb(0x1e, 0x23, 0x2b),
-            row_selected: Color32::from_rgb(0x25, 0x38, 0x52),
-            hot_text: Color32::from_rgb(0xba, 0xd4, 0xff),
-            tl_bg: Color32::from_rgb(0x17, 0x1b, 0x23),
-            tl_ruler_bg: Color32::from_rgb(0x1c, 0x21, 0x2a),
-            tl_ruler_tick: Color32::from_rgb(0x7e, 0x89, 0x99),
-            tl_ruler_text: Color32::from_rgb(0xb6, 0xc0, 0xce),
-            cti: Color32::from_rgb(0xe1, 0xed, 0xff),
-            work_area: Color32::from_rgb(0x40, 0x58, 0x75),
-            cache_green: Color32::from_rgb(0x3c, 0xa6, 0x4c),
-            cache_blue: Color32::from_rgb(0x38, 0x6f, 0xe4),
-            keyframe: Color32::from_rgb(0x9e, 0xac, 0xc0),
-            keyframe_selected: Color32::from_rgb(0xf4, 0xf7, 0xff),
-            pasteboard: Color32::from_rgb(0x11, 0x14, 0x1a),
-            timecode: Color32::from_rgb(0xe8, 0xec, 0xf2),
-            danger: Color32::from_rgb(0xe0, 0x4a, 0x3c),
-            warning: Color32::from_rgb(0xe8, 0x9a, 0x2c),
-            fx_header: Color32::from_rgb(0x22, 0x28, 0x32),
-            fx_header_active: Color32::from_rgb(0x29, 0x3a, 0x53),
-            tl_graph_selected: Color32::from_rgb(0x27, 0x36, 0x4b),
-            switch_well: Color32::from_rgb(0x18, 0x1d, 0x25),
-            tl_nav_bar: Color32::from_rgb(0x5a, 0x6b, 0x82),
-            tl_work_area_bar: Color32::from_rgb(0x65, 0x7d, 0x9c),
-            expr_bg: Color32::from_rgb(0x17, 0x1b, 0x23),
-            expr_text: Color32::from_rgb(0xff, 0xc2, 0xb8),
+            hover: Color32::from_gray(48),
+            pressed: Color32::from_gray(66),
+            field_bg: Color32::from_gray(8),
+            field_border: Color32::from_gray(68),
+            separator: Color32::from_gray(39),
+            row: Color32::from_gray(22),
+            row_alt: Color32::from_gray(30),
+            row_selected: Color32::from_gray(66),
+            hot_text: Color32::from_gray(220),
+            tl_bg: Color32::from_gray(8),
+            tl_ruler_bg: Color32::from_gray(24),
+            tl_ruler_tick: Color32::from_gray(125),
+            tl_ruler_text: Color32::from_gray(182),
+            cti: Color32::from_gray(238),
+            work_area: Color32::from_gray(88),
+            cache_green: Color32::from_gray(156),
+            cache_blue: Color32::from_gray(112),
+            keyframe: Color32::from_gray(164),
+            keyframe_selected: Color32::from_gray(238),
+            pasteboard: Color32::from_gray(2),
+            timecode: Color32::from_gray(232),
+            danger: Color32::from_gray(204),
+            warning: Color32::from_gray(154),
+            fx_header: Color32::from_gray(34),
+            fx_header_active: Color32::from_gray(64),
+            tl_graph_selected: Color32::from_gray(54),
+            switch_well: Color32::from_gray(17),
+            tl_nav_bar: Color32::from_gray(88),
+            tl_work_area_bar: Color32::from_gray(122),
+            expr_bg: Color32::from_gray(8),
+            expr_text: Color32::from_gray(222),
             labels: default_labels(),
             radius: 8.0,
             radius_sm: 4.0,
@@ -316,10 +316,9 @@ impl Tokens {
 }
 
 fn default_labels() -> [Color32; 17] {
-    effectcraft_color::Label::ALL.map(|l| {
-        let [r, g, b] = l.rgb();
-        Color32::from_rgb(r, g, b)
-    })
+    // Shades still distinguish layers while keeping the interface monochrome.
+    [42u8, 52, 62, 72, 82, 92, 102, 112, 122, 132, 142, 152, 162, 176, 190, 207, 226]
+        .map(Color32::from_gray)
 }
 
 static INTER_REGULAR: &[u8] = include_bytes!("../../../assets/fonts/Inter-Regular.ttf");

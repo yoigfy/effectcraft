@@ -1,13 +1,13 @@
-//! Windows only: embed the TokCraft app icon and version information in the executable.
+//! Windows only: embed the Tokeffects app icon and version information in the executable.
 //!
-//! The project's source of truth is assets/app-icon/tokcraft.png. We generate a standards-compliant
+//! The project's source of truth is assets/app-icon/tokeffects.png. We generate a standards-compliant
 //! 256 px ICO in OUT_DIR so Windows builds do not depend on a separately committed, easily-stale
 //! icon file. The image is PNG-compressed inside the ICO, as supported by modern Windows.
 
 use std::path::{Path, PathBuf};
 use std::{env, fs};
 
-fn write_tokcraft_ico(png_path: &Path, ico_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
+fn write_tokeffects_ico(png_path: &Path, ico_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
     use image::ImageEncoder;
 
     let source = image::open(png_path)?;
@@ -38,7 +38,7 @@ fn write_tokcraft_ico(png_path: &Path, ico_path: &Path) -> Result<(), Box<dyn st
 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-env-changed=TOKCRAFT_REQUIRE_WINRES");
+    println!("cargo:rerun-if-env-changed=TOKEEFFECTS_REQUIRE_WINRES");
 
     if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("windows") {
         return;
@@ -52,12 +52,12 @@ fn main() {
         println!("cargo:error=OUT_DIR is not set");
         return;
     };
-    let png_path = manifest_dir.join("../../assets/app-icon/tokcraft.png");
-    let ico_path = out_dir.join("tokcraft.ico");
+    let png_path = manifest_dir.join("../../assets/app-icon/tokeffects.png");
+    let ico_path = out_dir.join("tokeffects.ico");
     println!("cargo:rerun-if-changed={}", png_path.display());
 
-    if let Err(error) = write_tokcraft_ico(&png_path, &ico_path) {
-        println!("cargo:error=Could not generate TokCraft Windows icon from {}: {error}", png_path.display());
+    if let Err(error) = write_tokeffects_ico(&png_path, &ico_path) {
+        println!("cargo:error=Could not generate Tokeffects Windows icon from {}: {error}", png_path.display());
         return;
     }
 
@@ -66,19 +66,19 @@ fn main() {
     let mut resource = winresource::WindowsResource::new();
     resource
         .set_icon(&icon_path)
-        .set("ProductName", "TokCraft")
-        .set("FileDescription", "TokCraft video editor and motion graphics")
-        .set("OriginalFilename", "TokCraft.exe")
-        .set("InternalName", "TokCraft")
-        .set("CompanyName", "TokCraft")
+        .set("ProductName", "Tokeffects")
+        .set("FileDescription", "Tokeffects video editor and motion graphics")
+        .set("OriginalFilename", "Tokeffects.exe")
+        .set("InternalName", "Tokeffects")
+        .set("CompanyName", "Tokeffects")
         .set("ProductVersion", &version)
         .set("FileVersion", &version)
-        .set("LegalCopyright", "Copyright (c) 2026 TokCraft contributors");
+        .set("LegalCopyright", "Copyright (c) 2026 Tokeffects contributors");
 
     if let Err(error) = resource.compile() {
-        if env::var_os("TOKCRAFT_REQUIRE_WINRES").is_some() {
-            panic!("embedding the TokCraft Windows icon and version information failed: {error}");
+        if env::var_os("TOKEEFFECTS_REQUIRE_WINRES").is_some() {
+            panic!("embedding the Tokeffects Windows icon and version information failed: {error}");
         }
-        println!("cargo:warning=TokCraft executable built without Windows icon/version resources: {error}");
+        println!("cargo:warning=Tokeffects executable built without Windows icon/version resources: {error}");
     }
 }

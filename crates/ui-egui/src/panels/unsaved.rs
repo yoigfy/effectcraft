@@ -71,7 +71,7 @@ pub fn project_name(app: &EffectcraftApp) -> String {
 /// The window title: the project's path (or name) and `*` while it has unsaved changes.
 pub fn window_title(app: &EffectcraftApp) -> String {
     let doc = app.session.path.clone().unwrap_or_else(|| project_name(app));
-    format!("TokCraft — {doc}{}", if app.session.is_dirty() { " *" } else { "" })
+    format!("Tokeffects — {doc}{}", if app.session.is_dirty() { " *" } else { "" })
 }
 
 /// Whether the prompt is Revert Project (Revert / Cancel) instead of Unsaved Changes.
@@ -219,7 +219,7 @@ mod tests {
         crate::menus::invoke(&mut app, &ctx, "file.newProject", json!({})).unwrap();
         assert!(app.dialog.is_none());
         modified(&mut app);
-        assert!(window_title(&app).starts_with("TokCraft — "));
+        assert!(window_title(&app).starts_with("Tokeffects — "));
         assert!(window_title(&app).ends_with("Untitled Project.ecproj *"), "{}", window_title(&app));
         let r = crate::menus::invoke(&mut app, &ctx, "file.newProject", json!({})).unwrap();
         assert_eq!(r, json!({"dialog": "unsavedChanges"}));

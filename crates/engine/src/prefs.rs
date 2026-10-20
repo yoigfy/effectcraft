@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value, json};
 
 /// Current settings layout version.
-pub const PREFS_VERSION: u32 = 4;
+pub const PREFS_VERSION: u32 = 5;
 /// Settings file name in the config store.
 pub const PREFS_FILE: &str = "prefs.json";
 
@@ -93,7 +93,7 @@ macro_rules! page {
 }
 
 page!(General {
-    /// Interface language: `system` (the operating system's, where TokCraft has it, else
+    /// Interface language: `system` (the operating system's, where Tokeffects has it, else
     /// English), or a language code from `LANGUAGES`.
     language: String = "system".into(),
     /// Levels of Undo (1–99).
@@ -137,7 +137,7 @@ page!(AutoSave {
     enabled: bool = true,
     interval_minutes: u32 = 20,
     max_versions: u32 = 5,
-    /// `nextToProject` (an "TokCraft Auto-Save" folder beside the project) or `custom`.
+    /// `nextToProject` (an "Tokeffects Auto-Save" folder beside the project) or `custom`.
     location: String = "nextToProject".into(),
     folder: String = String::new(),
     save_on_render_start: bool = false,
@@ -520,7 +520,7 @@ pub fn migrate(mut v: Value) -> Value {
         a.insert("appearanceMode".into(), json!(mode));
         a.insert(slot.into(), json!(theme));
     }
-    // Version 3 is TokCraft's fast, dark workspace. Apply it once to the settings from the
+    // Version 3 is Tokeffects's fast, dark workspace. Apply it once to the settings from the
     // previous build too, so an existing installation does not silently stay in Light mode or
     // keep the slower preview defaults. Export resolution and quality are deliberately untouched.
     if version < 3 {
@@ -558,6 +558,17 @@ pub fn migrate(mut v: Value) -> Value {
             if m.get("previewCacheMb").and_then(Value::as_u64) == Some(3072) {
                 m.insert("previewCacheMb".into(), json!(768));
             }
+        }
+    }
+
+    // Tokeffects v5 pins existing installs to the requested monochrome dark appearance.
+    if version < 5 {
+        let appearance = obj.entry("appearance".to_string()).or_insert_with(|| json!({}));
+        if let Some(a) = appearance.as_object_mut() {
+            a.insert("theme".into(), json!("dark"));
+            a.insert("appearanceMode".into(), json!("dark"));
+            a.insert("darkTheme".into(), json!("dark"));
+            a.insert("useGradients".into(), json!(false));
         }
     }
 
@@ -1220,7 +1231,7 @@ pub fn pages() -> Vec<Page> {
                 s("general.expressionPickWhipCompact", "Expression Pick Whip Writes Compact English", B, true),
                 s("general.createSplitLayersAbove", "Create Split Layers Above Original Layer", B, true),
                 s("general.useSystemColorPicker", "Use System Color Picker", B, false),
-                Note("TokCraft always uses its own colour picker (the same on every platform and the web)."),
+                Note("Tokeffects always uses its own colour picker (the same on every platform and the web)."),
             ],
         },
         Page {
@@ -1232,7 +1243,7 @@ pub fn pages() -> Vec<Page> {
                 s("startup.offerCrashRecovery", "Offer to Open the Latest Auto-Save After a Crash", B, true),
                 s("startup.windowGraphics", "Window Graphics", Kind::Choice(WINDOW_GRAPHICS), true),
                 Note(
-                    "Window Graphics applies from the next launch. When the graphics driver stops TokCraft as its window opens, the next launch switches to OpenGL.",
+                    "Window Graphics applies from the next launch. When the graphics driver stops Tokeffects as its window opens, the next launch switches to OpenGL.",
                 ),
                 Section("Repair"),
                 Button { label: "Reset Settings", command: "prefs.reset", params: "{}" },
@@ -1579,7 +1590,7 @@ mod tokcraft_defaults_tests {
         let p = Prefs::from_json(
             r#"{"version":2,"appearance":{"theme":"light","appearanceMode":"light","darkTheme":"dark","lightTheme":"light","useGradients":true},"previews":{"fastPreviews":false,"zoomQuality":"moreAccurate"},"startup":{"showHomeOnLaunch":true}}"#,
         );
-        assert_eq!(p.version, 4);
+        assert_eq!(p.version, 5);
         assert_eq!(p.appearance.appearance_mode, "dark");
         assert_eq!(p.appearance.theme, "dark");
         assert!(!p.appearance.use_gradients);

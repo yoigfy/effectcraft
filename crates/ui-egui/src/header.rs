@@ -23,15 +23,15 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
     let mut x = rect.min.x + if app.integrated_titlebar && !app.ui.show_menu_bar { 80.0 } else { 10.0 };
 
     // Cache the small wolf mark as an egui texture once; don't decode or upload the PNG each frame.
-    let logo_id = egui::Id::new("tokcraft-wolf-logo");
+    let logo_id = egui::Id::new("tokeffects-wolf-logo");
     let ctx = ui.ctx().clone();
     let logo = ctx.data(|d| d.get_temp::<egui::TextureHandle>(logo_id)).or_else(|| {
-        let bytes: &[u8] = include_bytes!("../../../assets/app-icon/tokcraft.png");
+        let bytes: &[u8] = include_bytes!("../../../assets/app-icon/tokeffects.png");
         let decoded = image::load_from_memory(bytes).ok()?;
         let rgba = decoded.to_rgba8();
         let size = [rgba.width() as usize, rgba.height() as usize];
         let pixels = egui::ColorImage::from_rgba_unmultiplied(size, rgba.as_raw());
-        let handle = ctx.load_texture("tokcraft-wolf-logo", pixels, egui::TextureOptions::LINEAR);
+        let handle = ctx.load_texture("tokeffects-wolf-logo", pixels, egui::TextureOptions::LINEAR);
         ctx.data_mut(|d| d.insert_temp(logo_id, handle.clone()));
         Some(handle)
     });
@@ -45,11 +45,11 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
             Color32::WHITE,
         );
     }
-    p.text(pos2(x + 29.0, cy), Align2::LEFT_CENTER, "TokCraft", Tokens::semibold(16.0), t.text);
+    p.text(pos2(x + 29.0, cy), Align2::LEFT_CENTER, "Tokeffects", Tokens::semibold(16.0), t.text);
     let bresp = ui.interact(brand, egui::Id::new("brand"), Sense::click());
-    app.auto.add_response("header.about", &bresp, "About TokCraft");
+    app.auto.add_response("header.about", &bresp, "About Tokeffects");
     widgets::focus_outline(ui, &bresp, &t);
-    if bresp.on_hover_text(tr("About TokCraft")).clicked() {
+    if bresp.on_hover_text(tr("About Tokeffects")).clicked() {
         app.dialog = Some(Dialog::About);
     }
     x += 114.0;

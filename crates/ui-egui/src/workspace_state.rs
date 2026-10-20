@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::dock::{DockNode, Floating, PanelKind, PanelWindow, SplitSize};
 use crate::state::UiState;
 
-const FILE: &str = "tokcraft-workspaces.json";
+const FILE: &str = "tokeffects-workspaces.json";
 const MAX_BYTES: usize = 1024 * 1024;
 const MAX_WORKSPACES: usize = 64;
 const MAX_NODES: usize = 4096;
