@@ -5,3 +5,9 @@ source:       original work
 license:      MIT OR Apache-2.0
 added:        2026-10-11 by vangel76 (Claude Code agent, #757)
 notes:        Effect choices, values and key timings written from scratch for EffectCraft on its own Transition effects; not derived from any Adobe preset (.ffx) or its values.
+
+asset:        Motion animation presets (Quick Zoom Hit, Soft Impact, Impact Shake, Vertical Shake, Spin Hit, Flash Impact, Fast Push In, Zoom Punch Out, Bounce Pop, Snap Slide In, Tilt Punch, Flicker Hit)
+author:       EffectCraft contributors
+source:       Original native presets authored from scratch using EffectCraft's own transform and Brightness & Contrast controls; informed by common short-form editing patterns from the user-supplied FastFX reference pack
+license:      MIT OR Apache-2.0
+notes:        No Premiere Pro extension code, Adobe project files, overlays, or sound assets were imported. Presets use EffectCraft-native effects and keyframes.
