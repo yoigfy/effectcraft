@@ -18,7 +18,7 @@ use serde_json::json;
 use crate::i18n::{tr, tr_args};
 use crate::icons::{self, Icon};
 use crate::theme::Tokens;
-use crate::{EffectcraftApp, widgets};
+use crate::{TokCraftApp, widgets};
 
 pub const THUMB_W: usize = 96;
 pub const THUMB_H: usize = 54;
@@ -116,7 +116,7 @@ pub fn format_size(bytes: u64) -> String {
 /// The Kind column: what a recent file is, by its extension, in the interface language.
 fn kind_of(path: &str) -> &'static str {
     tr(match std::path::Path::new(path).extension().and_then(|e| e.to_str()).map(str::to_ascii_lowercase).as_deref() {
-        Some("ecproj") => "TokEffect project",
+        Some("ecproj") => "TokCraft project",
         Some("aep" | "aepx") => "After Effects project",
         Some("json" | "lottie") => "Lottie animation",
         _ => "Project",
@@ -166,7 +166,7 @@ pub fn decode_thumb(text: &str) -> Option<egui::ColorImage> {
 
 /// Store the viewer's frame as the open project's thumbnail after it is opened or saved (once per
 /// saved revision, when the viewer shows that revision).
-pub fn capture_thumbnail(app: &mut EffectcraftApp) {
+pub fn capture_thumbnail(app: &mut TokCraftApp) {
     let s = &app.session;
     let (Some(path), Some(_)) = (s.path.clone(), s.config.as_ref()) else { return };
     if s.is_dirty() {
@@ -190,7 +190,7 @@ pub fn capture_thumbnail(app: &mut EffectcraftApp) {
     app.home_thumb_saved = Some(key);
 }
 
-fn thumb_texture(app: &mut EffectcraftApp, ctx: &egui::Context, path: &str) -> Option<egui::TextureHandle> {
+fn thumb_texture(app: &mut TokCraftApp, ctx: &egui::Context, path: &str) -> Option<egui::TextureHandle> {
     if let Some(t) = app.home_thumbs.get(path) {
         return t.clone();
     }
@@ -209,7 +209,7 @@ fn thumb_texture(app: &mut EffectcraftApp, ctx: &egui::Context, path: &str) -> O
 const RAIL_W: f32 = 236.0;
 
 /// Draw the Home screen over `rect` (the whole workspace).
-pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
+pub fn show(app: &mut TokCraftApp, ui: &mut egui::Ui, rect: Rect) {
     let t = app.tokens;
     let ctx = ui.ctx().clone();
     let p = ui.painter().with_clip_rect(rect);
@@ -231,7 +231,7 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
 }
 
 /// The left rail: New / Open Project and the Home / Templates / Learn pages.
-fn rail_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, p: &egui::Painter, rail: Rect, actions: &mut Vec<(&'static str, serde_json::Value)>) {
+fn rail_ui(app: &mut TokCraftApp, ui: &mut egui::Ui, p: &egui::Painter, rail: Rect, actions: &mut Vec<(&'static str, serde_json::Value)>) {
     let t = app.tokens;
     let x0 = rail.min.x + 16.0;
     let w = rail.width() - 32.0;
@@ -274,7 +274,7 @@ fn rail_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, p: &egui::Painter, rail:
 
 /// The Home page: the welcome, quick-start tiles and the recent projects table.
 fn home_page(
-    app: &mut EffectcraftApp,
+    app: &mut TokCraftApp,
     ui: &mut egui::Ui,
     p: &egui::Painter,
     area: Rect,
@@ -284,7 +284,7 @@ fn home_page(
     let t = app.tokens;
     let (x0, w) = (area.min.x, area.width());
     let mut y = area.min.y;
-    p.text(pos2(x0, y + 14.0), Align2::LEFT_CENTER, tr("Welcome to TokEffect"), Tokens::semibold(26.0), t.tab_text_active);
+    p.text(pos2(x0, y + 14.0), Align2::LEFT_CENTER, tr("Welcome to TokCraft"), Tokens::semibold(26.0), t.tab_text_active);
     y += 40.0;
     p.text(
         pos2(x0, y + 8.0),
@@ -417,7 +417,7 @@ fn home_page(
     }
 }
 
-fn run_actions(app: &mut EffectcraftApp, ctx: &egui::Context, actions: Vec<(&str, serde_json::Value)>) {
+fn run_actions(app: &mut TokCraftApp, ctx: &egui::Context, actions: Vec<(&str, serde_json::Value)>) {
     for (id, params) in actions {
         let before = (app.session.path.clone(), app.session.revision);
         match crate::menus::invoke(app, ctx, id, params) {
@@ -487,7 +487,7 @@ mod tests {
         assert_eq!(format_ago(now, now - 30 * 86_400), "2026-08-22");
         assert_eq!(format_ago(now, now + 100), "Just now");
         assert_eq!((format_size(900), format_size(13_000), format_size(3_500_000)), ("900 B".into(), "13 KB".into(), "3.3 MB".into()));
-        assert_eq!((kind_of("/a/B.ecproj"), kind_of("c.AEP"), kind_of("x")), ("TokEffect project", "After Effects project", "Project"));
+        assert_eq!((kind_of("/a/B.ecproj"), kind_of("c.AEP"), kind_of("x")), ("TokCraft project", "After Effects project", "Project"));
     }
 
     /// The Home screen's own text goes through the interface catalog (#574): the Opened and Kind
@@ -500,7 +500,7 @@ mod tests {
         crate::i18n::set_current("zh-hant");
         let tw = (format_ago(now, now - 60), kind_of("x"));
         crate::i18n::set_current("en");
-        assert_eq!(zh, ("刚刚".into(), "3 小时前".into(), "昨天".into(), "EffectCraft 项目"));
+        assert_eq!(zh, ("刚刚".into(), "3 小时前".into(), "昨天".into(), "TokCraft 项目"));
         assert_eq!(tw, ("1 分鐘前".into(), "專案"));
         assert_eq!(tr("Filter recent files"), "Filter recent files");
     }
@@ -509,7 +509,7 @@ mod tests {
     fn home_screen_registers_its_controls() {
         let mut s = effectcraft_engine::Session::default();
         s.prefs.push_recent("/projects/Alpha.ecproj");
-        let mut app = EffectcraftApp::new(s);
+        let mut app = TokCraftApp::new(s);
         let ctx = egui::Context::default();
         crate::theme::install(&ctx, &app.tokens, crate::i18n::language(&app));
         ctx.run_ui(Default::default(), |_| {}).textures_delta.clear();
@@ -538,12 +538,12 @@ mod tests {
 
     #[test]
     fn learn_tab_lists_and_starts_tutorials() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = TokCraftApp::new(effectcraft_engine::Session::default());
         app.ui.start_screen = true;
         app.ui.home_learn = true;
         let ctx = egui::Context::default();
         crate::theme::install(&ctx, &app.tokens, crate::i18n::language(&app));
-        let frame = |app: &mut EffectcraftApp| {
+        let frame = |app: &mut TokCraftApp| {
             ctx.run_ui(Default::default(), |ui| {
                 app.auto.begin_frame();
                 show(app, ui, Rect::from_min_size(pos2(0.0, 0.0), vec2(1200.0, 800.0)));
