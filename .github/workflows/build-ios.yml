@@ -18,7 +18,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: tokeffects-ios-${{ github.ref }}
+  group: tokeffects-ios-${{ github.run_id }}
   cancel-in-progress: false
 
 jobs:
