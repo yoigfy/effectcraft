@@ -75,6 +75,7 @@ jobs:
           $compiler = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
           & $compiler "/DMyAppVersion=$version" 'packaging/windows/TokEffect.iss'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not (Test-Path 'dist/TokEffect.exe')) { throw 'The single-file TokEffect installer was not produced.' }
 
       - name: Upload single-file TokEffect installer
         uses: actions/upload-artifact@v7
