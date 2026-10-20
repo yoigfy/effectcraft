@@ -460,7 +460,7 @@ pub struct Frames {
 impl Default for Frames {
     fn default() -> Self {
         #[cfg(not(target_arch = "wasm32"))]
-        let threads = std::thread::available_parallelism().map(|n| n.get().saturating_sub(1).clamp(1, 8)).unwrap_or(2);
+        let threads = std::thread::available_parallelism().map(|n| n.get().saturating_sub(1).clamp(1, 4)).unwrap_or(2);
         Frames {
             cache: Arc::new(Mutex::new(Cache { map: HashMap::new(), order: VecDeque::new(), bytes: 0, gpu_bytes: 0, budget: 768 << 20, gpu_budget: GPU_BUDGET, playhead: None })),
             inflight: Arc::new(Mutex::new(HashSet::new())),
