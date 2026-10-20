@@ -1162,7 +1162,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "effectcraft"
+name = "tokcraft"
 version = "0.12.0"
 dependencies = [
  "cpal",
