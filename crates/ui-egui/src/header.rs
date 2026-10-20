@@ -22,16 +22,37 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
     let cy = rect.center().y;
     let mut x = rect.min.x + if app.integrated_titlebar && !app.ui.show_menu_bar { 80.0 } else { 10.0 };
 
-    // Text-only wordmark keeps the product name clear without borrowing brand artwork.
-    let brand = Rect::from_min_size(pos2(x, cy - 12.0), vec2(82.0, 24.0));
-    p.text(brand.left_center(), Align2::LEFT_CENTER, "TokCraft", Tokens::semibold(16.0), t.text);
+    // Cache the small wolf mark as an egui texture once; don't decode or upload the PNG each frame.
+    let logo_id = egui::Id::new("tokcraft-wolf-logo");
+    let ctx = ui.ctx().clone();
+    let logo = ctx.data(|d| d.get_temp::<egui::TextureHandle>(logo_id)).or_else(|| {
+        let bytes: &[u8] = include_bytes!("../../../assets/app-icon/tokcraft.png");
+        let decoded = image::load_from_memory(bytes).ok()?;
+        let rgba = decoded.to_rgba8();
+        let size = [rgba.width() as usize, rgba.height() as usize];
+        let pixels = egui::ColorImage::from_rgba_unmultiplied(size, rgba.as_raw());
+        let handle = ctx.load_texture("tokcraft-wolf-logo", pixels, egui::TextureOptions::LINEAR);
+        ctx.data_mut(|d| d.insert_temp(logo_id, handle.clone()));
+        Some(handle)
+    });
+    let brand = Rect::from_min_size(pos2(x, cy - 12.0), vec2(108.0, 24.0));
+    if let Some(logo) = logo {
+        let logo_rect = Rect::from_min_size(pos2(x, cy - 11.0), vec2(22.0, 22.0));
+        p.image(
+            logo.id(),
+            logo_rect,
+            Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)),
+            Color32::WHITE,
+        );
+    }
+    p.text(pos2(x + 29.0, cy), Align2::LEFT_CENTER, "TokCraft", Tokens::semibold(16.0), t.text);
     let bresp = ui.interact(brand, egui::Id::new("brand"), Sense::click());
     app.auto.add_response("header.about", &bresp, "About TokCraft");
     widgets::focus_outline(ui, &bresp, &t);
     if bresp.on_hover_text(tr("About TokCraft")).clicked() {
         app.dialog = Some(Dialog::About);
     }
-    x += 88.0;
+    x += 114.0;
 
     // Home.
     let home = Rect::from_min_size(pos2(x, cy - 13.0), vec2(26.0, 26.0));
