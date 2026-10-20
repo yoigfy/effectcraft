@@ -1,6 +1,6 @@
 //! Design tokens. Every widget reads colours/sizes from [`Tokens`] so themes apply everywhere.
 //!
-//! TokEffect's dark-first workspace uses restrained graphite surfaces, clear contrast, and a blue accent.
+//! TokCraft's dark-first workspace uses restrained graphite surfaces, clear contrast, and a blue accent.
 //! Fonts are Inter + JetBrains Mono (OFL).
 
 use std::sync::Arc;
@@ -130,30 +130,30 @@ impl Tokens {
     pub fn for_kind(kind: ThemeKind) -> Self {
         let dark = Tokens {
             kind,
-            app_bg: Color32::from_rgb(0x11, 0x13, 0x18),
-            header_bg: Color32::from_rgb(0x17, 0x1a, 0x21),
-            panel_bg: Color32::from_rgb(0x1d, 0x21, 0x29),
-            tab_text: Color32::from_rgb(0x9b, 0xa5, 0xb4),
+            app_bg: Color32::from_rgb(0x0f, 0x11, 0x16),
+            header_bg: Color32::from_rgb(0x15, 0x18, 0x20),
+            panel_bg: Color32::from_rgb(0x1b, 0x1f, 0x27),
+            tab_text: Color32::from_rgb(0x99, 0xa4, 0xb5),
             tab_text_active: Color32::from_rgb(0xf4, 0xf6, 0xfa),
             focus: Color32::from_rgb(0x78, 0xad, 0xff),
-            accent: Color32::from_rgb(0x4b, 0x8d, 0xff),
-            accent_hover: Color32::from_rgb(0x70, 0xa7, 0xff),
+            accent: Color32::from_rgb(0x57, 0x96, 0xff),
+            accent_hover: Color32::from_rgb(0x75, 0xad, 0xff),
             text: Color32::from_rgb(0xe8, 0xec, 0xf2),
             text_dim: Color32::from_rgb(0xb0, 0xb8, 0xc5),
             text_faint: Color32::from_rgb(0x84, 0x90, 0xa1),
             icon: Color32::from_rgb(0xb7, 0xc0, 0xcd),
             icon_active: Color32::from_rgb(0xff, 0xff, 0xff),
-            hover: Color32::from_rgb(0x29, 0x2f, 0x3a),
-            pressed: Color32::from_rgb(0x33, 0x3b, 0x49),
-            field_bg: Color32::from_rgb(0x17, 0x1b, 0x23),
-            field_border: Color32::from_rgb(0x34, 0x3b, 0x49),
-            separator: Color32::from_rgb(0x2a, 0x30, 0x3b),
+            hover: Color32::from_rgb(0x27, 0x2d, 0x37),
+            pressed: Color32::from_rgb(0x32, 0x3b, 0x49),
+            field_bg: Color32::from_rgb(0x13, 0x16, 0x1d),
+            field_border: Color32::from_rgb(0x2d, 0x34, 0x40),
+            separator: Color32::from_rgb(0x27, 0x2d, 0x37),
             row: Color32::from_rgb(0x1d, 0x21, 0x29),
-            row_alt: Color32::from_rgb(0x20, 0x25, 0x30),
-            row_selected: Color32::from_rgb(0x29, 0x3b, 0x55),
+            row_alt: Color32::from_rgb(0x1e, 0x23, 0x2b),
+            row_selected: Color32::from_rgb(0x25, 0x38, 0x52),
             hot_text: Color32::from_rgb(0xba, 0xd4, 0xff),
             tl_bg: Color32::from_rgb(0x17, 0x1b, 0x23),
-            tl_ruler_bg: Color32::from_rgb(0x20, 0x25, 0x2f),
+            tl_ruler_bg: Color32::from_rgb(0x1c, 0x21, 0x2a),
             tl_ruler_tick: Color32::from_rgb(0x7e, 0x89, 0x99),
             tl_ruler_text: Color32::from_rgb(0xb6, 0xc0, 0xce),
             cti: Color32::from_rgb(0xe1, 0xed, 0xff),
@@ -162,12 +162,12 @@ impl Tokens {
             cache_blue: Color32::from_rgb(0x38, 0x6f, 0xe4),
             keyframe: Color32::from_rgb(0x9e, 0xac, 0xc0),
             keyframe_selected: Color32::from_rgb(0xf4, 0xf7, 0xff),
-            pasteboard: Color32::from_rgb(0x12, 0x16, 0x1d),
+            pasteboard: Color32::from_rgb(0x11, 0x14, 0x1a),
             timecode: Color32::from_rgb(0xe8, 0xec, 0xf2),
             danger: Color32::from_rgb(0xe0, 0x4a, 0x3c),
             warning: Color32::from_rgb(0xe8, 0x9a, 0x2c),
-            fx_header: Color32::from_rgb(0x24, 0x2a, 0x35),
-            fx_header_active: Color32::from_rgb(0x2b, 0x3c, 0x54),
+            fx_header: Color32::from_rgb(0x22, 0x28, 0x32),
+            fx_header_active: Color32::from_rgb(0x29, 0x3a, 0x53),
             tl_graph_selected: Color32::from_rgb(0x27, 0x36, 0x4b),
             switch_well: Color32::from_rgb(0x18, 0x1d, 0x25),
             tl_nav_bar: Color32::from_rgb(0x5a, 0x6b, 0x82),
@@ -487,8 +487,8 @@ pub fn apply_visuals(ctx: &egui::Context, t: &Tokens) {
     v.window_stroke = Stroke::new(1.0, t.field_border);
     v.window_corner_radius = egui::CornerRadius::same(8);
     v.menu_corner_radius = egui::CornerRadius::same(6);
-    v.popup_shadow = egui::epaint::Shadow { offset: [0, 6], blur: 20, spread: 0, color: Color32::from_black_alpha(150) };
-    v.window_shadow = egui::epaint::Shadow { offset: [0, 10], blur: 36, spread: 0, color: Color32::from_black_alpha(170) };
+    v.popup_shadow = egui::epaint::Shadow { offset: [0, 6], blur: 12, spread: 0, color: Color32::from_black_alpha(150) };
+    v.window_shadow = egui::epaint::Shadow { offset: [0, 10], blur: 20, spread: 0, color: Color32::from_black_alpha(170) };
     for w in [&mut v.widgets.noninteractive, &mut v.widgets.inactive, &mut v.widgets.hovered, &mut v.widgets.active, &mut v.widgets.open] {
         w.corner_radius = egui::CornerRadius::same(t.radius_sm as u8);
     }
@@ -513,22 +513,22 @@ pub fn apply_visuals(ctx: &egui::Context, t: &Tokens) {
     // [`theme_preference`]); both get ours, so whichever it picks, egui's defaults never show.
     ctx.all_styles_mut(|s| {
         s.visuals = v.clone();
-        s.spacing.item_spacing = egui::vec2(6.0, 4.0);
-        s.spacing.button_padding = egui::vec2(8.0, 3.0);
-        s.spacing.interact_size.y = 22.0;
-        s.spacing.menu_margin = egui::Margin::same(5);
+        s.spacing.item_spacing = egui::vec2(7.0, 5.0);
+        s.spacing.button_padding = egui::vec2(9.0, 4.0);
+        s.spacing.interact_size.y = 24.0;
+        s.spacing.menu_margin = egui::Margin::same(7);
         // Scroll bars always show (egui's float in only over the list), so long menus and lists
         // can be dragged without a mouse wheel or touchpad (#269).
         s.spacing.scroll = egui::style::ScrollStyle::solid();
         // The handle takes the text colour: the fill it would otherwise get is the colour of its
         // track (both are the field background), which left it invisible until hovered.
         s.spacing.scroll.foreground_color = true;
-        s.text_styles.insert(TextStyle::Body, FontId::new(12.0, FontFamily::Proportional));
-        s.text_styles.insert(TextStyle::Button, FontId::new(12.0, FontFamily::Proportional));
+        s.text_styles.insert(TextStyle::Body, FontId::new(12.5, FontFamily::Proportional));
+        s.text_styles.insert(TextStyle::Button, FontId::new(12.5, FontFamily::Proportional));
         s.text_styles.insert(TextStyle::Small, FontId::new(11.0, FontFamily::Proportional));
-        s.text_styles.insert(TextStyle::Heading, FontId::new(15.0, FontFamily::Name("semibold".into())));
+        s.text_styles.insert(TextStyle::Heading, FontId::new(16.0, FontFamily::Name("semibold".into())));
         s.text_styles.insert(TextStyle::Monospace, FontId::new(12.0, FontFamily::Monospace));
-        s.animation_time = 0.1;
+        s.animation_time = 0.06;
     });
 }
 
