@@ -29,7 +29,7 @@ final class LocalWebServer {
                 host: NWEndpoint.Host("127.0.0.1"),
                 port: port
             )
-            let listener = try NWListener(using: parameters, on: port)
+            let listener = try NWListener(using: parameters)
             self.listener = listener
             listener.stateUpdateHandler = { [weak self] state in
                 guard let self else { return }
