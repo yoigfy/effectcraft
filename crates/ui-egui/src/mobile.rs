@@ -3,6 +3,7 @@ use egui::{Align2, Color32, Rect, Sense, Stroke, StrokeKind, pos2, vec2};
 use serde_json::json;
 
 use crate::dock::PanelKind;
+use crate::icons::{self, Icon};
 use crate::theme::Tokens;
 use crate::EffectcraftApp;
 
@@ -57,14 +58,13 @@ pub(crate) fn show_header(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rec
         t.text,
     );
 
-    let menu_rect = Rect::from_min_max(
-        pos2(rect.max.x - 74.0, rect.center().y - 18.0),
-        pos2(rect.max.x - 8.0, rect.center().y + 18.0),
-    );
+    let menu_rect = Rect::from_min_size(pos2(rect.max.x - 54.0, rect.center().y - 22.0), vec2(44.0, 44.0));
     painter.rect_filled(menu_rect, 8.0, t.row_alt);
     painter.rect_stroke(menu_rect, 8.0, Stroke::new(1.0, t.field_border), StrokeKind::Inside);
-    painter.text(menu_rect.center(), Align2::CENTER_CENTER, "Menu", Tokens::ui(12.0), t.text);
-    let response = ui.interact(menu_rect, egui::Id::new("tokeffects-mobile-menu"), Sense::click());
+    icons::paint(&painter, menu_rect.shrink(12.0), Icon::Hamburger, t.text);
+    let response = ui
+        .interact(menu_rect, egui::Id::new("tokeffects-mobile-menu"), Sense::click())
+        .on_hover_text("Menu");
     let open = response.clicked().then_some(egui::SetOpenCommand::Bool(true));
     egui::Popup::menu(&response).open_memory(open).show(|menu| {
         menu.set_min_width(220.0);
@@ -144,15 +144,15 @@ pub(crate) fn show_navigation(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect:
     painter.rect_filled(rect, 0.0, t.header_bg);
     painter.line_segment([rect.left_top(), rect.right_top()], Stroke::new(1.0, t.separator));
 
-    let choices: [(&str, PanelKind); 5] = [
-        ("Project", PanelKind::Project),
-        ("Viewer", PanelKind::Composition),
-        ("Timeline", PanelKind::Timeline),
-        ("Edit", PanelKind::Properties),
-        ("Export", PanelKind::RenderQueue),
+    let choices: [(&str, Icon, PanelKind); 5] = [
+        ("Project", Icon::Folder, PanelKind::Project),
+        ("Viewer", Icon::Comp, PanelKind::Composition),
+        ("Timeline", Icon::Graph, PanelKind::Timeline),
+        ("Edit", Icon::Fx, PanelKind::Properties),
+        ("Render", Icon::Play, PanelKind::RenderQueue),
     ];
     let cell = rect.width() / choices.len() as f32;
-    for (index, (label, panel)) in choices.iter().enumerate() {
+    for (index, (label, icon, panel)) in choices.iter().enumerate() {
         let r = Rect::from_min_size(pos2(rect.min.x + index as f32 * cell, rect.min.y + 2.0), vec2(cell, (rect.height() - 4.0).max(1.0)));
         let active = active_panel(ui.ctx()) == *panel;
         let response = ui.interact(r.shrink2(vec2(2.0, 2.0)), egui::Id::new(("tokeffects-mobile-tab", *panel)), Sense::click());
@@ -166,6 +166,8 @@ pub(crate) fn show_navigation(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect:
         } else if response.hovered() {
             painter.rect_filled(r.shrink2(vec2(3.0, 4.0)), 7.0, t.row_alt);
         }
-        painter.text(r.center(), Align2::CENTER_CENTER, *label, Tokens::ui(11.0), colour);
+        let icon_rect = Rect::from_center_size(pos2(r.center().x, r.min.y + 22.0), vec2(20.0, 20.0));
+        icons::paint(&painter, icon_rect, *icon, colour);
+        painter.text(pos2(r.center().x, r.max.y - 17.0), Align2::CENTER_CENTER, *label, Tokens::ui(11.5), colour);
     }
 }

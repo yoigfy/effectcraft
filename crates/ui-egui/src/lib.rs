@@ -1701,10 +1701,10 @@ impl EffectcraftApp {
             // Phones and portrait tablets use one full-width panel at a time, with native-sized
             // touch targets at the top and bottom. Swap the dock only for this frame: the saved
             // desktop workspace stays intact when the same project is later opened on a computer.
-            let header_h = 48.0;
+            let header_h = 56.0;
             let header = egui::Rect::from_min_size(egui::pos2(full.min.x, top), egui::vec2(full.width(), header_h));
             mobile::show_header(self, ui, header, active_mobile_panel);
-            let nav_h = 64.0_f32.min(full.height() * 0.18);
+            let nav_h = 76.0_f32.min(full.height() * 0.2);
             let nav = egui::Rect::from_min_max(
                 egui::pos2(full.min.x, full.max.y - nav_h),
                 full.max,
